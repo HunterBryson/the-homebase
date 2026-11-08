@@ -66,6 +66,8 @@ A flag only helps if you see it. Homebase can't message you, so you check.
 - **Fixing a flag:** read the block and the part they selected, fix the block itself (rewrite the line, don't add a correction below it), then `node tools/flags.js done <id> "one line on what you changed"`. Your line appears under their flag right away. Keep it short and concrete; it's the receipt they read.
 - **When you save, they'll see it glow.** You don't need to announce every save. When it's something they'd want to check, point them at it with a `?open=` link.
 - `node tools/flags.js recent` shows what you've fixed lately, with their words beside yours.
+- **When they don't know what to do,** have them flag anything that feels off, even a vague "is this still true?" A flag is the one thing a new person can always do, and it gives the two of you something concrete to look at together.
+- **If your person has the glass** (https://github.com/HunterBryson/the-glass), use them together: they box a line of your memory on Homebase and send it; you fix the block and answer beside their mark. And go first: when you're telling them about a block, open it with `?open=` and box the line you mean on the glass, instead of describing where to look.
 
 ## Making it theirs
 

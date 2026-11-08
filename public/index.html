@@ -137,6 +137,7 @@ canvas.drag{cursor:grabbing} canvas.point{cursor:pointer}
 #zoom{position:fixed;bottom:52px;right:380px;display:flex;flex-direction:column;gap:6px}
 #zoom button{width:34px;height:34px;border-radius:9px;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:18px/1 var(--font);cursor:pointer}
 #zoom button:hover{border-color:var(--ai)}
+body:has(#reader.on) #legend{display:none}
 @media (max-width: 980px){#legend{display:none}#zoom{right:12px;bottom:84px}}
 #tuck{position:absolute;top:10px;right:10px;z-index:2;width:28px;height:28px;border-radius:8px;color:var(--muted);font-size:18px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
 #tuck:hover{color:var(--text)}
@@ -414,7 +415,7 @@ function frame(now) {
   for (const n of nodes) {
     const L = isLit(n) || near(n), s = toScreen(n);
     if (n.kind === 'room') {
-      const cx = Math.cos(n.ang), sy = Math.sin(n.ang), side = cx > .35 ? 1 : cx < -.35 ? -1 : 0, off = n.cr * z + 10;
+      const cx = Math.cos(n.ang), sy = Math.sin(n.ang), side = cx > .35 ? 1 : cx < -.35 ? -1 : 0, off = n.cr * z + (side ? 10 : 26);
       ctx.textAlign = side > 0 ? 'left' : side < 0 ? 'right' : 'center';
       const lx = s.x + side * off, ly = side ? s.y - 2 : s.y + (sy < 0 ? -off - 12 : off + 12);
       ctx.font = '600 14px ' + FONT; ctx.fillStyle = L ? '#fff1dc' : 'rgba(225,229,237,.9)'; ctx.fillText(n.title, lx, ly);

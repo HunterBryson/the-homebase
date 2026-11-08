@@ -27,11 +27,19 @@ From Hunter: I haven't been able to make a memory framework that manages itself.
 
 **Flag what's wrong.** Tap ⚑ on any block. If only one part is wrong, select that part first. Add a few words if you want ("the garlic is already dug up"). Your AI sees your flags when it starts, fixes the block, and its answer shows up right under your flag.
 
-![A flagged block, with the person's words waiting for the AI](docs/flag.png)
+![A flag on the garden block: the part Sam selected, and Sam's words, waiting for the AI](docs/flag.png)
+
+When your AI fixes it, its answer sits right under your words, and you can see exactly what it changed in the block:
+
+![The flag on Jules, fixed: Sam's words, the AI's answer, and the change it made](docs/fixed.png)
+
+**Not sure what to do?** Flag anything at all, even "this doesn't sound like me" or "is this still true?" Your AI looks at the block with you and works it out. Flags are the easiest way into your AI's memory: you don't have to know how it works to point at something.
 
 **See what changed.** Whenever your AI saves something to its memory, that light glows on the web and shows up under "Changed since you looked." Open it and you'll see exactly what changed: new words in green, removed words crossed out. The glow fades once you've looked.
 
 ![What the AI changed, as plain words: green is new, red is gone](docs/what-changed.png)
+
+**Even better with [the glass](https://github.com/HunterBryson/the-glass).** The glass is a see-through layer over your screen, where you circle or box anything and send it to your AI with a few words, and it answers right beside your mark. Put Homebase on one side and the glass over it, and you can box a line of your AI's memory and say "this is old," and it fixes the line while you watch. Your AI can draw on the glass too, so it can point at the part of its memory it means instead of describing it. It's the way Hunter and Odie look after Odie's memory every day, and it's the easiest start for someone new: you don't need to know what to ask, you just point.
 
 **Make the left side yours.** It starts nearly empty. Fill it with whatever you reach for: pages your AI builds you, sites you open every day, the blocks you check most. Ask your AI to add things, or start from the suggested set.
 
