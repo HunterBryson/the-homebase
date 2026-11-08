@@ -45,7 +45,7 @@ When your AI fixes it, its answer sits right under your words, and you can see e
 
 ## Setting it up
 
-You need an AI that can work on your computer and keeps its memory in files. The **Claude desktop app** with its **Code** tab works well; so does any AI that can run commands in a folder (Codex, Cursor and others).
+You need an AI that works on **your own computer** and keeps its memory in files there. (Claude on the web, on a phone, or in a cloud session can't: Homebase reads a folder on your machine.) The **Claude desktop app** with its **Code** tab works well; so does any AI that can run commands in a folder (Codex, Cursor and others).
 
 Open a chat with your AI, in the folder where it lives, and paste this:
 
