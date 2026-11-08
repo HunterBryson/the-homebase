@@ -85,7 +85,7 @@ They won't edit files. They'll ask you, and here's where each thing lives.
   An item opens either a `url` (a site, or a page you built and serve somewhere) or a `block` (a path in your brain, opened in the reader). Icons: `mark words person chat book room link page money music calendar mail tool star`. When you build them a page or a tool, add it here, so they never have to remember where it lives.
 - **Color:** `ai.color` (any hex). The whole web takes its tint from it.
 - **Rooms:** `rooms` in the config renames a top-level folder on the web. A room can also have its own `INDEX.md` or `README.md`; tapping the room opens it.
-- **The outer ring:** `edges` puts people or other AIs at the edge of the web, like `[{ "name": "Mom", "color": "#8fb4ff" }, { "name": "Billy", "color": "#5fb3f9", "picture": "pictures/billy.png" }]`. They're there to show who's in your world. Their memory isn't drawn.
+- **The outer ring:** `edges` puts people or other AIs at the edge of the web, like `[{ "name": "Mom", "color": "#8fb4ff" }, { "name": "Max", "color": "#5fb3f9", "picture": "pictures/max.png" }]`. They're there to show who's in your world. Their memory isn't drawn.
 - After changing `homebase.config.json`, run `node tools/open.js --restart`. Changes to the brain and to `data/nav.json` show up on their own within a few seconds.
 
 ## How it reads a brain
