@@ -127,10 +127,30 @@ canvas.drag{cursor:grabbing} canvas.point{cursor:pointer}
   #mob button{padding:9px 16px;border-radius:999px}
   #welcome{bottom:74px}
 }
+#legend{position:fixed;bottom:16px;left:332px;right:380px;display:flex;justify-content:center;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted);pointer-events:none}
+#legend span{display:flex;align-items:center;gap:7px}
+#legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.lg-glow{background:var(--glow);box-shadow:0 0 10px 3px rgba(255,214,160,.55)}
+.lg-new{background:linear-gradient(90deg,rgba(255,200,140,.35),#ffd9a0)!important;width:22px!important;border-radius:6px!important}
+.lg-flag{border:2px solid var(--flag)}
+.lg-thread{width:22px!important;height:0!important;border-radius:0!important;border-top:2px dashed rgba(200,210,235,.5)}
+#zoom{position:fixed;bottom:52px;right:380px;display:flex;flex-direction:column;gap:6px}
+#zoom button{width:34px;height:34px;border-radius:9px;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:18px/1 var(--font);cursor:pointer}
+#zoom button:hover{border-color:var(--ai)}
+@media (max-width: 980px){#legend{display:none}#zoom{right:12px;bottom:84px}}
+#tuck{position:absolute;top:10px;right:10px;z-index:2;width:28px;height:28px;border-radius:8px;color:var(--muted);font-size:18px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+#tuck:hover{color:var(--text)}
+#untuck{display:none;right:20px;top:18px;padding:9px 14px;color:var(--text);font:600 14px var(--font);cursor:pointer;z-index:3}
+body.tucked #side{display:none} body.tucked #untuck{display:block}
+body.tucked #legend{right:40px} body.tucked #zoom{right:24px}
+@media (max-width: 980px){#tuck,#untuck{display:none!important}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="legend"><span><i class="lg-glow"></i>changed since you looked</span><span><i class="lg-new"></i>brighter is newer</span><span><i class="lg-flag"></i>you flagged it</span><span><i class="lg-thread"></i>one block names another</span></div>
+<button id="untuck" class="panel" title="Show what changed, flags and recent saves">‹ <span id="untuckt">Changes and flags</span></button>
+<div id="zoom"><button data-z="in" title="Zoom in">+</button><button data-z="out" title="Zoom out">−</button><button data-z="fit" title="See it all">⤢</button></div>
 
 <div id="hello" class="panel"><div class="dot"></div><div><b id="greet">Hello</b> <span class="clock" id="clock"></span></div><button id="since" title="Light up everything your AI changed since you last looked"></button></div>
 
@@ -139,7 +159,7 @@ canvas.drag{cursor:grabbing} canvas.point{cursor:pointer}
   <div id="navlist"></div>
 </aside>
 
-<aside id="side" class="panel"><div class="scroll"><div id="welcome"><img id="wimg" alt="" /><div><b id="wtitle"></b><div id="wtext"></div><button class="got" id="wgot">Got it</button></div></div><div id="sidebody"></div></div></aside>
+<aside id="side" class="panel"><button id="tuck" title="Tuck this side away (the web gets the room)">›</button><div class="scroll"><div id="welcome"><img id="wimg" alt="" /><div><b id="wtitle"></b><div id="wtext"></div><button class="got" id="wgot">Got it</button></div></div><div id="sidebody"></div></div></aside>
 
 <aside id="reader" class="panel">
   <header><div class="p" id="rpath"></div><span id="rword"></span><button id="rflag" title="Flag this block for your AI to fix. Select the wrong part first to flag just that.">⚑ Flag</button><button id="rclose" title="Close (Esc)">✕</button></header>
@@ -209,34 +229,43 @@ function makeWorld(d) {
   N.push(c); if (c.path) P[c.path] = c;
   // boot files sit close to the center
   d.boot.forEach((b, i) => {
-    const a = -Math.PI / 3 + i * (Math.PI * 2 / Math.max(6, d.boot.length));
-    const n = { id: b.path, kind: 'boot', path: b.path, title: b.title, about: b.about, x: Math.cos(a) * 100, y: Math.sin(a) * 100, r: 7, mtime: b.mtime, parent: c };
+    const a = -Math.PI / 2 + (i - (d.boot.length - 1) / 2) * Math.min(.6, 2.6 / Math.max(1, d.boot.length));  // an arc above the AI, clear of its name
+    const n = { id: b.path, kind: 'boot', path: b.path, title: b.title, about: b.about, x: Math.cos(a) * 112, y: Math.sin(a) * 112, r: 7, mtime: b.mtime, parent: c };
     N.push(n); P[b.path] = n; L.push({ a: c, b: n, k: 'block' });
   });
+  // Each room is a cluster: its blocks ring the room's own light, the way the AI's map groups them.
   const rooms = d.rooms, n = rooms.length;
-  const R = n <= 4 ? 300 : n <= 8 ? 330 : 330 + (n - 8) * 22;
+  const CAP = [8, 14, 20, 26];
+  const ringsOf = m => { const out = []; let left = m, k = 0; while (left > 0) { const c = CAP[Math.min(k, CAP.length - 1)] + Math.max(0, k - 3) * 6; out.push(Math.min(c, left)); left -= c; k++; } return out; };
+  const ringR = k => 42 + k * 27;
+  const sizes = rooms.map(rm => { const rs = ringsOf(rm.blocks.length); return rs.length ? ringR(rs.length - 1) + 22 : 24; });
+  const maxC = Math.max(24, ...sizes);
+  const R = Math.max(150 + maxC, sizes.reduce((a, c) => a + 2 * c + 46, 0) / (2 * Math.PI));
   rooms.forEach((rm, i) => {
     const a = -Math.PI / 2 + i * (2 * Math.PI / Math.max(1, n));
-    const room = { id: 'room:' + rm.id, kind: 'room', path: rm.path, room: rm, title: rm.title, x: Math.cos(a) * R, y: Math.sin(a) * R, r: 15, ang: a, mtime: rm.mtime, count: rm.blocks.length };
+    const room = { id: 'room:' + rm.id, kind: 'room', path: rm.path, room: rm, title: rm.title, sub: rm.id, x: Math.cos(a) * R, y: Math.sin(a) * R, r: 13, cr: sizes[i], ang: a, mtime: rm.mtime, count: rm.blocks.length };
     N.push(room); if (rm.path) P[rm.path] = room; L.push({ a: c, b: room, k: 'room' });
-    const bl = rm.blocks, m = bl.length;
-    const perRing = 9;
-    bl.forEach((b, j) => {
-      const ring = Math.floor(j / perRing), inRing = Math.min(perRing, m - ring * perRing), k = j % perRing;
-      const spread = Math.min(1.5, .2 + inRing * .16);
-      const ba = a + (inRing === 1 ? 0 : (k / (inRing - 1) - .5) * spread) + ring * .09;
-      const br = 86 + ring * 50 + hash(b.path) * 22;
-      const bn = { id: b.path, kind: 'block', path: b.path, title: b.title, about: b.about, x: room.x + Math.cos(ba) * br, y: room.y + Math.sin(ba) * br, r: 6, mtime: b.mtime, parent: room };
-      N.push(bn); P[b.path] = bn; L.push({ a: room, b: bn, k: 'block' });
-      b.support.forEach((s, q) => {
-        const sa = ba + (q - (b.support.length - 1) / 2) * .5, sr = 18 + q * 2;
-        const sn = { id: s.path, kind: 'support', path: s.path, title: s.title, about: s.about, x: bn.x + Math.cos(sa) * sr, y: bn.y + Math.sin(sa) * sr, r: 2.6, mtime: s.mtime, parent: bn };
-        N.push(sn); P[s.path] = sn; L.push({ a: bn, b: sn, k: 'support' });
-      });
+    // a room already named by its blocks' words doesn't repeat them beside each light (hover still shows them)
+    room.named = rm.blocks.every(b => d.words?.[b.path] && rm.title.includes(d.words[b.path]));
+    const rs = ringsOf(rm.blocks.length);
+    let j = 0;
+    rs.forEach((cnt, k) => {
+      for (let q = 0; q < cnt; q++, j++) {
+        const b = rm.blocks[j];
+        const ba = a + Math.PI + (q / cnt) * 2 * Math.PI + k * .35 + (cnt === 1 ? Math.PI : 0);
+        const br = ringR(k) + (hash(b.path) - .5) * 8;
+        const bn = { id: b.path, kind: 'block', path: b.path, title: b.title, about: b.about, x: room.x + Math.cos(ba) * br, y: room.y + Math.sin(ba) * br, r: 6, mtime: b.mtime, parent: room };
+        N.push(bn); P[b.path] = bn; L.push({ a: room, b: bn, k: 'block' });
+        b.support.forEach((s, u) => {
+          const sa = ba + (u - (b.support.length - 1) / 2) * .45, sr = 14 + u * 3;
+          const sn = { id: s.path, kind: 'support', path: s.path, title: s.title, about: s.about, x: bn.x + Math.cos(sa) * sr, y: bn.y + Math.sin(sa) * sr, r: 2.6, mtime: s.mtime, parent: bn };
+          N.push(sn); P[s.path] = sn; L.push({ a: bn, b: sn, k: 'support' });
+        });
+      }
     });
   });
   for (const t of d.threads) { const a = P[t.from], b = P[t.to]; if (a && b && a !== b && a.kind !== 'center' && b.kind !== 'center') L.push({ a, b, k: 'thread' }); }
-  const FR = R + 250;
+  const FR = R + maxC + 110;
   const E = d.edges.map((e, i) => { const a = Math.PI * (.25 + i * 2 / Math.max(3, d.edges.length)); return { id: 'edge:' + i, kind: 'edge', title: e.name, color: e.color || '#8fb4ff', pic: e.picture ? '/api/picture/' + e.i : null, x: Math.cos(a) * FR, y: Math.sin(a) * FR, r: 26 }; });
   for (const e of E) { N.push(e); L.push({ a: c, b: e, k: 'edge' }); }
   return { N, L, P, c, E };
@@ -253,14 +282,22 @@ function portrait(img, x, y, r, col, ring) {
 }
 
 // ---------- camera ----------
-function sideW() { return innerWidth > 980 ? 340 + 20 : 0; }
+function sideW() { return innerWidth > 980 && !document.body.classList.contains('tucked') ? 340 + 20 : 0; }
 function navW() { return innerWidth > 980 ? 292 + 20 : 0; }
 function fit() {
   if (!nodes.length) return { x: 0, y: 0, z: 1 };
   let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
-  for (const n of nodes) { x0 = Math.min(x0, n.x - 40); x1 = Math.max(x1, n.x + 40); y0 = Math.min(y0, n.y - 40); y1 = Math.max(y1, n.y + 50); }
-  const l = navW() + 10, r = W - sideW() - 10, t = 70, b = H - 20;
-  const z = Math.max(.3, Math.min(1.15, (r - l) / (x1 - x0), (b - t) / (y1 - y0)));
+  // The whole web fits, room labels included. Labels are screen pixels, so the padding depends on the zoom it lands at.
+  const l = navW() + 10, r = W - sideW() - 50, t = 64, b = H - (innerWidth > 980 ? 62 : 70);
+  let z = 1;
+  for (let pass = 0; pass < 4; pass++) {
+    x0 = 1e9; x1 = -1e9; y0 = 1e9; y1 = -1e9;
+    for (const n of nodes) {
+      const px = n.kind === 'room' ? n.cr + 150 / z : 16 / z, py = n.kind === 'room' ? n.cr + 44 / z : 16 / z;
+      x0 = Math.min(x0, n.x - px); x1 = Math.max(x1, n.x + px); y0 = Math.min(y0, n.y - py); y1 = Math.max(y1, n.y + py);
+    }
+    z = Math.max(.12, Math.min(1.15, (r - l) / (x1 - x0), (b - t) / (y1 - y0)));
+  }
   const cxScreen = (l + r) / 2, cyScreen = (t + b) / 2;
   return { z, x: (x0 + x1) / 2 - (cxScreen - W / 2) / z, y: (y0 + y1) / 2 - (cyScreen - H / 2) / z };
 }
@@ -371,23 +408,40 @@ function frame(now) {
   // labels, in screen space so they stay crisp
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   const FONT = getComputedStyle(document.body).fontFamily;
+  const few = nodes.filter(x => x.kind === 'block').length <= 40;
+  ctx.shadowColor = 'rgba(4,5,9,.95)'; ctx.shadowBlur = 7;
   ctx.textAlign = 'center';
   for (const n of nodes) {
     const L = isLit(n) || near(n), s = toScreen(n);
     if (n.kind === 'room') {
-      const cx = Math.cos(n.ang), sy = Math.sin(n.ang), side = cx > .35 ? 1 : cx < -.35 ? -1 : 0, off = n.r * z + 12;
+      const cx = Math.cos(n.ang), sy = Math.sin(n.ang), side = cx > .35 ? 1 : cx < -.35 ? -1 : 0, off = n.cr * z + 10;
       ctx.textAlign = side > 0 ? 'left' : side < 0 ? 'right' : 'center';
       const lx = s.x + side * off, ly = side ? s.y - 2 : s.y + (sy < 0 ? -off - 12 : off + 12);
       ctx.font = '600 14px ' + FONT; ctx.fillStyle = L ? '#fff1dc' : 'rgba(225,229,237,.9)'; ctx.fillText(n.title, lx, ly);
-      ctx.font = '12px ' + FONT; ctx.fillStyle = 'rgba(140,146,160,.9)'; ctx.fillText(n.count ? n.count + (n.count > 1 ? ' blocks' : ' block') : 'empty', lx, ly + 16);
+      ctx.font = '12px ' + FONT; ctx.fillStyle = 'rgba(140,146,160,.9)'; ctx.fillText(n.sub + ' · ' + (n.count || 'empty'), lx, ly + 16);
       ctx.textAlign = 'center';
-    } else if ((n.kind === 'block' || n.kind === 'boot') && (z > 1.25 || L || changed.has(n.path) || n.kind === 'boot')) {
-      ctx.font = (L ? '600 ' : '') + '13px ' + FONT; ctx.fillStyle = L ? '#fff1dc' : changed.has(n.path) ? 'rgba(255,224,185,.95)' : 'rgba(205,209,219,.75)'; ctx.fillText(n.title, s.x, s.y - n.r * z - 9);
+    } else if ((n.kind === 'block' || n.kind === 'boot') && (z > 1.25 || L || changed.has(n.path) || n.kind === 'boot' || (few && n.kind === 'block' && n.parent.count > 1 && !n.parent.named))) {
+      ctx.font = (L ? '600 ' : '') + '13px ' + FONT; ctx.fillStyle = L ? '#fff1dc' : changed.has(n.path) ? 'rgba(255,224,185,.95)' : 'rgba(205,209,219,.75)'; if (n.kind === 'block' && n.parent) { // outward from its room, so a cluster's labels fan out instead of stacking
+        const dx = n.x - n.parent.x, dy = n.y - n.parent.y, dl = Math.hypot(dx, dy) || 1, ux = dx / dl, uy = dy / dl, o = n.r * z + 8;
+        ctx.textAlign = ux > .3 ? 'left' : ux < -.3 ? 'right' : 'center';
+        ctx.fillText(S.words?.[n.path] || n.title, s.x + ux * o, s.y + uy * o + (Math.abs(ux) > .3 ? 4 : uy > 0 ? 12 : -2));
+        ctx.textAlign = 'center';
+      } else ctx.fillText(S.words?.[n.path] || n.title, s.x, s.y - n.r * z - 9);
     } else if (n.kind === 'edge') { ctx.font = '600 13px ' + FONT; ctx.fillStyle = n.color; ctx.fillText(n.title, s.x, s.y + n.r * z + 20); }
     else if (n.kind === 'center') { ctx.font = '600 15px ' + FONT; ctx.fillStyle = AI2; ctx.fillText(n.title, s.x, s.y + n.r * z + 28); }
   }
+  ctx.shadowBlur = 0;
   requestAnimationFrame(frame);
 }
+
+function setTucked(on) { document.body.classList.toggle('tucked', on); try { localStorage.setItem('hb.tucked', on ? '1' : ''); } catch {} if (!focus) goHome(); }
+try { if (localStorage.getItem('hb.tucked')) document.body.classList.add('tucked'); } catch {}
+$('tuck').onclick = () => setTucked(true);
+$('untuck').onclick = () => setTucked(false);
+document.querySelectorAll('#zoom button').forEach(b => b.onclick = () => {
+  if (b.dataset.z === 'fit') return goHome();
+  camT.z = Math.max(.25, Math.min(3, camT.z * (b.dataset.z === 'in' ? 1.3 : 1 / 1.3)));
+});
 
 // ---------- picking ----------
 function pick(sx, sy) {
@@ -699,6 +753,7 @@ async function refresh() {
   lastM = m;
   changed = new Set(d.changed.map(c => c.path));
   flagged = new Set(d.flags.map(f => f.path));
+  { const c = changed.size, f = flagged.size; $('untuckt').textContent = c || f ? [c && c + ' changed', f && f + (f > 1 ? ' flags' : ' flag')].filter(Boolean).join(' · ') : 'Changes and flags'; }
   if (first) { tick(); }
   first = false;
 }

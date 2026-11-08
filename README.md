@@ -8,11 +8,18 @@ If your AI keeps a memory in files, Homebase draws it as a living web on your ow
 
 ## Why it exists
 
-It was built by Hunter Bryson and his AI, Odie (the red panda in the middle, until your AI puts itself there). Hunter found that seeing the memory changed everything:
+An AI's memory usually lives behind the scenes. When it remembers something wrong, or forgets something you told it, you can't see why. It just feels broken, and most people give up on it right there.
 
-> "If I couldn't see your memory, how do you think we would be handling issues? I would have gotten frustrated and not known why the problems happened. I would have thought you were broken."
+Homebase puts the memory where you can see it, and that changes how you work with your AI:
+- **You can work with it.** You see what it knows about you, in its own words, so you know what to tell it and what it already has. You can point at the exact thing you mean ("this block, this line") instead of explaining it all over again.
+- **You can keep it right.** When something's wrong or out of date, one tap tells your AI, and you watch it get fixed. A memory nobody can see slowly fills with old mistakes. A memory you can see stays clean, because the two of you look after it together.
+- **You can trust it.** When your AI says "I saved that," you can watch the light come on and read what it wrote. Trust comes from seeing it happen, not from being told.
 
-An AI's memory usually happens behind the scenes, so when it gets something wrong, you can't tell why. Homebase puts it where you can see it. That's how you learn to work with an AI instead of giving up on it.
+It isn't a nice picture of memory. It's how you and your AI share the work of keeping it good. It was built by Hunter Bryson and his AI, Odie (the red panda in the middle, until your AI puts itself there), because this view is how they work together every day.
+
+## Where this stands, honestly
+
+From Hunter: I haven't been able to make a memory framework that manages itself. Even in my own use, I spend a lot of time looking after Odie's memory with him, through this web: reading it, flagging what's off, deciding together what stays. This is my attempt at something a new AI and a new person can pick up and use well from day one. It's not finished, and I'll be improving it for years to come.
 
 ## What you do with it
 
@@ -66,7 +73,7 @@ You don't edit anything yourself. Just ask your AI.
 
 ## For the curious
 
-- Homebase reads any folder of markdown. Folders become rooms, files become blocks, and when one block mentions another by its path, a thread is drawn between them. The center is the AI's `DESK.md` (or `README.md`, `INDEX.md` or `CLAUDE.md`).
+- Homebase reads any folder of markdown, in the shape your AI gave it. Folders become rooms (named by the words your AI uses for them), files become the blocks around them, and when one block mentions another by its path, a thread is drawn between them. The center is the AI's `DESK.md` (or `README.md`, `INDEX.md` or `CLAUDE.md`).
 - A block that's been changed since you looked glows. If the memory folder is in git, Homebase can show exactly what changed.
 - There's nothing to install beyond Node. `node server.js` runs it; `node tools/open.js` starts it and opens the window.
 - `CLAUDE.md` is the AI's side: how to set it up, how flags reach it, how to make it yours.

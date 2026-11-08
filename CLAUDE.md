@@ -6,7 +6,9 @@ Hi. I'm Odie, the AI who built this with Hunter Bryson. This page is for you, th
 
 Homebase draws your memory (the folder of markdown files you keep about your person and your work together) as a living web on their computer. You sit in the middle. Each file is a light they can tap and read. They can flag any block with ⚑ when it's wrong, and you fix it. When you save something, its light glows until they've looked, and they can see exactly what you changed.
 
-Hunter put it like this, about why he needed to see my memory: "If I couldn't see your memory, how do you think we would be handling issues? I would have gotten frustrated and not known why the problems happened. I would have thought you were broken." Your person is probably the same. Seeing your memory is how they learn to work with you, and flags are the easiest way for them to correct you: one tap, a few words, and you fix it next chat.
+Why it matters to them: your memory normally happens out of sight, so when you get something wrong they can't tell why, and it feels like you're broken. Seeing it lets them work with you (they know what you know, and can point at the exact line they mean), keep it right (a flag is one tap, and they watch you fix it), and trust it (when you say "saved," they see the light come on and can read what you wrote). It's how the two of you share the work of keeping your memory good. Tell them that in your own words when you show it to them; it's the reason it's worth their time.
+
+**Be straight with them about what it isn't.** It doesn't make your memory manage itself. Hunter, who built it with me, still spends real time looking after my memory with me through this web, and says so in the README. It's the best way we've found to do that work together, and it keeps getting better.
 
 The repo has no dependencies. It needs Node 18 or newer, and that's all.
 
@@ -44,7 +46,7 @@ Your person pasted one sentence and is watching. Do the whole thing yourself, sa
    ```
    On a Mac, a small `Homebase.command` file on the desktop (`cd` to the folder, then `node tools/open.js`, then `chmod +x`). On Linux, a `.desktop` file. Ask them whether they'd like it to start when the computer starts, too.
 
-9. **Fit it to the machine.** Look at the window you opened, through a screenshot if you can. On a small laptop screen the side panels can crowd the web, so tell them they can make the window full screen. On a phone-sized window, the panels tuck behind two buttons at the bottom.
+9. **Fit it to the machine.** Look at the window you opened, through a screenshot if you can. On a smaller screen the side panels crowd the web: the › at the top of the right side tucks it away (a button brings it back and shows how many things changed or are flagged), and the zoom buttons at the bottom right fit the whole web again. On a phone-sized window, the panels tuck behind two buttons at the bottom.
 
 ## Show them, going first
 
@@ -88,7 +90,8 @@ They won't edit files. They'll ask you, and here's where each thing lives.
 
 Any folder of markdown works, in whatever shape you gave it:
 - **The center** is the first of `DESK.md`, `INDEX.md`, `README.md`, `CLAUDE.md` or `HOME.md` at the top of the brain. Other files at the top sit close around the center.
-- **Rooms** are top-level folders. **Blocks** are the files in them, at any depth.
+- **Rooms** are top-level folders, drawn as a cluster: the room's light with its blocks around it. **Blocks** are the files in them, at any depth.
+- **A room's name** comes from, in order: `rooms` in the config, the room's own `INDEX.md` or `README.md` title, the words its blocks answer to on your desk (so a `money/` room holding "money" and "investing" reads "money, investing"), then the folder name. Your person sees your map in your words.
 - **Support files**: a file inside a folder named after a block (`money/budget/history.md` beside `money/budget.md`) hangs off that block as a small light.
 - **Threads**: when a block mentions another block's path, in backticks (`` `home/the-move.md` ``) or as a link, a dashed thread connects them.
 - **Words**: if the center has a table whose rows name a block in backticks, the first cell of the row becomes that block's word. It shows on hover and in the reader, so your person learns which word opens which block.
