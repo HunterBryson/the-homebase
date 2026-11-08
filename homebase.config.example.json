@@ -1,0 +1,8 @@
+{
+  "brain": "../My Brain/memory",
+  "person": "Sam",
+  "ai": { "name": "Odie", "picture": "public/odie.jpg", "color": "#f2a84b" },
+  "port": 7940,
+  "rooms": { "human": "You", "self": "Me" },
+  "edges": []
+}

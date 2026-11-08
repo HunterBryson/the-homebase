@@ -1,0 +1,10 @@
+{
+  "name": "the-homebase",
+  "version": "1.0.0",
+  "description": "A living web of your AI's memory, on your own computer. Flag what's wrong, see what changed.",
+  "type": "module",
+  "private": true,
+  "scripts": { "start": "node server.js", "check": "node tools/check.js" },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}

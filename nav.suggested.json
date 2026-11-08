@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "name": "Your brain",
+      "items": [
+        { "name": "Where we left off", "sub": "What your AI is picking up next", "block": "FOOTING.md", "icon": "mark" },
+        { "name": "The desk", "sub": "Every word, and the block it opens", "block": "DESK.md", "icon": "words" },
+        { "name": "About you", "sub": "What your AI knows about you", "block": "human/human.md", "icon": "person" }
+      ]
+    },
+    {
+      "name": "Every day",
+      "items": [
+        { "name": "Claude", "sub": "Talk to your AI on the web", "url": "https://claude.ai", "icon": "chat" }
+      ],
+      "empty": "Ask your AI to add the sites you open every day."
+    },
+    {
+      "name": "Built for you",
+      "items": [],
+      "empty": "When your AI makes you a page or a tool, it goes here."
+    }
+  ]
+}

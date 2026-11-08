@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Homebase</title>
+<link rel="icon" href="/api/picture/ai" />
+<style>
+:root{
+  --bg:#06070b; --panel:rgba(12,14,20,.78); --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
+  --text:#dfe2ea; --muted:#9097a8; --faint:#5d6476; --ai:#f2a84b; --ai2:#ffcf8a; --flag:#e88fb4; --glow:#ffd6a0;
+  --r:14px; --font:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif; --mono:"Cascadia Code",Consolas,ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block;cursor:grab}
+canvas.drag{cursor:grabbing} canvas.point{cursor:pointer}
+.panel{position:fixed;background:var(--panel);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 20px 60px rgba(0,0,0,.45)}
+
+/* top left: hello */
+#hello{left:20px;top:18px;padding:10px 16px 10px 12px;display:flex;align-items:center;gap:12px;border-radius:999px;max-width:calc(100vw - 40px)}
+#hello .dot{width:24px;height:24px;border-radius:50%;flex:none;background:radial-gradient(circle at 50% 55%,var(--ai) 0 30%,color-mix(in srgb,var(--ai) 20%,transparent) 31% 60%,transparent 61%)}
+#hello b{font-weight:600} #hello .clock{color:var(--muted)}
+#since{display:none;margin-left:4px;padding:5px 12px;border-radius:999px;background:rgba(255,214,160,.12);border:1px solid rgba(255,214,160,.35);color:var(--glow);font-weight:600;font-size:14px;white-space:nowrap}
+#since.on{display:inline-block} #since:hover{background:rgba(255,214,160,.2)}
+
+/* left: the nav, theirs */
+#nav{left:20px;top:78px;bottom:20px;width:292px;display:flex;flex-direction:column;overflow:hidden}
+#find{display:flex;align-items:center;gap:10px;margin:12px 12px 6px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+#find input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font:inherit}
+#find .k{font:12px var(--mono);color:var(--faint);border:1px solid var(--line2);border-radius:5px;padding:0 5px}
+#navlist{flex:1;overflow:auto;padding:4px 8px 14px}
+.group{font-size:12.5px;color:var(--muted);letter-spacing:.3px;padding:14px 10px 6px}
+.item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--text)}
+.item:hover{background:rgba(255,255,255,.05)}
+.item .ic{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;background:rgba(255,255,255,.04);color:var(--ai)}
+.item .ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.item .t{min-width:0} .item .t div:first-child{font-weight:500}
+.item .sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{font-size:13.5px;color:var(--faint);padding:4px 10px 6px;line-height:1.45}
+.yours{margin:10px 8px 4px;padding:14px 14px 12px;border-radius:12px;border:1px dashed var(--line2);color:var(--muted);font-size:14px;line-height:1.5}
+.yours b{color:var(--text);display:block;margin-bottom:4px;font-size:15px}
+.yours .use{margin-top:10px;padding:7px 14px;border-radius:999px;background:color-mix(in srgb,var(--ai) 16%,transparent);border:1px solid color-mix(in srgb,var(--ai) 45%,transparent);color:var(--ai2);font-weight:600}
+.suggested{opacity:.55;pointer-events:none}
+
+/* right: what's waiting */
+#side{right:20px;top:18px;bottom:20px;width:340px;display:flex;flex-direction:column;overflow:hidden;transition:opacity .25s}
+#side .scroll{overflow:auto;padding:6px 14px 16px;flex:1}
+.sec{padding:12px 4px 4px}
+.sec h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.3px;display:flex;justify-content:space-between;align-items:center}
+.sec h3 button{font-size:13px;color:var(--ai2);font-weight:500}
+.row{display:block;width:100%;text-align:left;padding:9px 10px;border-radius:10px;margin:2px 0}
+.row:hover{background:rgba(255,255,255,.05)}
+.row b{font-weight:500;display:block} .row small{display:block;color:var(--muted);font-size:13px}
+.row.glow b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--glow);box-shadow:0 0 10px var(--glow);margin-right:8px;vertical-align:1px}
+.row.flag b::before{content:"⚑";color:var(--flag);margin-right:7px}
+.row.done small.what{color:#b9e3c6}
+.day{font-size:12.5px;color:var(--faint);padding:10px 10px 2px}
+.quiet{color:var(--faint);font-size:14px;padding:4px 10px 8px}
+.save small.paths{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* the reader */
+#reader{right:20px;top:18px;bottom:20px;width:min(640px,calc(100vw - 360px));display:flex;flex-direction:column;transform:translateX(calc(100% + 40px));transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:5}
+#reader.on{transform:none}
+#reader header{display:flex;align-items:center;gap:10px;padding:14px 14px 10px 20px;border-bottom:1px solid var(--line)}
+#reader .p{flex:1;min-width:0;font:13px var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.chip.word{color:var(--ai2);border-color:color-mix(in srgb,var(--ai) 40%,transparent)}
+#rflag{padding:6px 12px;border-radius:999px;border:1px solid rgba(232,143,180,.4);color:var(--flag);font-weight:600;font-size:14px;white-space:nowrap}
+#rflag:hover{background:rgba(232,143,180,.1)}
+#rclose{width:32px;height:32px;border-radius:50%;color:var(--muted);font-size:16px} #rclose:hover{background:rgba(255,255,255,.06);color:var(--text)}
+#tabs{display:flex;gap:4px;padding:8px 18px 0}
+#tabs button{padding:6px 12px;border-radius:8px;color:var(--muted);font-size:14px}
+#tabs button.on{background:rgba(255,255,255,.06);color:var(--text)}
+#tabs button.glowtab.on,#tabs button.glowtab{color:var(--glow)}
+#rbody{flex:1;overflow:auto;padding:10px 26px 40px}
+.flagbox{margin:12px 0 4px;padding:12px 14px;border-radius:12px;background:rgba(232,143,180,.06);border:1px solid rgba(232,143,180,.25)}
+.flagbox .fh{display:flex;justify-content:space-between;gap:10px;color:var(--flag);font-size:13.5px;font-weight:600}
+.flagbox .fh button{color:var(--muted);font-weight:500}
+.flagbox blockquote{margin:8px 0;padding:4px 10px;border-left:2px solid rgba(232,143,180,.5);color:var(--muted);font-size:14px}
+.flagbox textarea{width:100%;margin-top:8px;min-height:64px;resize:vertical;background:rgba(0,0,0,.25);border:1px solid var(--line2);border-radius:8px;color:var(--text);font:15px/1.45 var(--font);padding:9px 10px;outline:0}
+.flagbox .st{font-size:12.5px;color:var(--faint);margin-top:4px}
+.flagbox.done{background:rgba(126,224,161,.05);border-color:rgba(126,224,161,.22)}
+.flagbox.done .fh{color:#9ed9b2}
+.flagbox .ans{margin-top:8px;color:var(--text)}
+.diff{margin-top:12px;font-size:15.5px;line-height:1.55}
+.diff span{display:block;padding:5px 12px;border-left:3px solid transparent;border-radius:4px;margin:2px 0}
+.diff .a{color:#e8f7ec;background:rgba(126,224,161,.09);border-left-color:#7ee0a1}
+.diff .d{color:#d9a3a3;background:rgba(255,107,107,.06);border-left-color:rgba(255,107,107,.6);text-decoration:line-through;text-decoration-color:rgba(240,160,160,.45)}
+.diff .c{color:var(--faint)}
+.diff .h{color:var(--faint);padding:0 12px}
+.commits{margin-top:18px;font-size:13.5px;color:var(--muted)} .commits div{padding:3px 0}
+
+/* markdown */
+.md{font-size:15.5px;line-height:1.62}
+.md h1{font-size:24px;margin:16px 0 10px;font-weight:650;color:#fff}
+.md h2{font-size:18px;margin:22px 0 8px;font-weight:600;color:#fff}
+.md h3{font-size:16px;margin:18px 0 6px;font-weight:600}
+.md p{margin:8px 0} .md ul,.md ol{margin:6px 0;padding-left:22px} .md li{margin:3px 0}
+.md code{font:13.5px var(--mono);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:5px}
+.md pre{background:rgba(0,0,0,.3);padding:10px 12px;border-radius:8px;overflow:auto} .md pre code{background:none;padding:0}
+.md blockquote{margin:8px 0;padding:2px 14px;border-left:2px solid var(--line2);color:var(--muted)}
+.md table{border-collapse:collapse;margin:10px 0;font-size:14px;display:block;overflow:auto}
+.md th,.md td{border:1px solid var(--line2);padding:5px 9px;text-align:left;vertical-align:top}
+.md th{color:var(--muted);font-weight:600}
+.md a,.md .link{color:var(--ai2);cursor:pointer;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--ai) 40%,transparent);text-underline-offset:3px}
+.md hr{border:0;border-top:1px solid var(--line2);margin:16px 0}
+.md strong{color:#fff}
+
+/* tooltip, welcome, toast */
+#tip{pointer-events:none;padding:10px 13px;max-width:340px;font-size:14px;opacity:0;transition:opacity .15s;z-index:6}
+#tip.on{opacity:1} #tip b{display:block;font-weight:600} #tip small{color:var(--muted);display:block} #tip .w{color:var(--ai2);font-size:13px}
+#welcome{display:none;gap:12px;align-items:flex-start;margin:14px 4px 4px;padding:14px;border-radius:12px;background:color-mix(in srgb,var(--ai) 8%,transparent);border:1px solid color-mix(in srgb,var(--ai) 28%,transparent)}
+#welcome.on{display:flex} #welcome img{width:46px;height:46px;border-radius:50%;flex:none;object-fit:cover}
+#welcome b{display:block;margin-bottom:3px} #welcome p{margin:0 0 6px;color:var(--muted);font-size:14px;line-height:1.45}
+#welcome .got{margin-top:4px;padding:5px 14px;border-radius:999px;border:1px solid var(--line2);font-weight:600;font-size:14px}
+#toast{left:50%;top:20px;transform:translate(-50%,-80px);padding:9px 16px;border-radius:999px;transition:transform .25s;z-index:7;font-size:14px}
+#toast.on{transform:translate(-50%,0)}
+#mob{display:none}
+
+@media (max-width: 980px){
+  #nav,#side{display:none} #nav.open,#side.open{display:flex;z-index:4} #nav{width:calc(100vw - 40px)} #side{width:calc(100vw - 40px);top:78px}
+  #reader{width:calc(100vw - 24px);right:12px;top:12px;bottom:12px}
+  #mob{display:flex;position:fixed;left:50%;bottom:16px;transform:translateX(-50%);gap:8px;z-index:3}
+  #mob button{padding:9px 16px;border-radius:999px}
+  #welcome{bottom:74px}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hello" class="panel"><div class="dot"></div><div><b id="greet">Hello</b> <span class="clock" id="clock"></span></div><button id="since" title="Light up everything your AI changed since you last looked"></button></div>
+
+<aside id="nav" class="panel">
+  <label id="find"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a90a0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Find anything in the brain" autocomplete="off"/><span class="k">/</span></label>
+  <div id="navlist"></div>
+</aside>
+
+<aside id="side" class="panel"><div class="scroll"><div id="welcome"><img id="wimg" alt="" /><div><b id="wtitle"></b><div id="wtext"></div><button class="got" id="wgot">Got it</button></div></div><div id="sidebody"></div></div></aside>
+
+<aside id="reader" class="panel">
+  <header><div class="p" id="rpath"></div><span id="rword"></span><button id="rflag" title="Flag this block for your AI to fix. Select the wrong part first to flag just that.">⚑ Flag</button><button id="rclose" title="Close (Esc)">✕</button></header>
+  <div id="tabs"></div>
+  <div id="rbody" class="md"></div>
+</aside>
+
+<div id="tip" class="panel"></div>
+<div id="toast" class="panel"></div>
+<div id="mob"><button class="panel" data-t="nav">Yours</button><button class="panel" data-t="side">Changes</button></div>
+
+<script>
+(() => {
+// ---------- small helpers ----------
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const j = async (u, o) => { const r = await fetch(u, { cache: 'no-store', ...o }); return r.json(); };
+const post = (u, b) => j(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b || {}) });
+const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return ((h >>> 0) % 1000) / 1000; };
+const hrs = iso => (Date.now() - Date.parse(iso)) / 36e5;
+const ago = iso => { const h = hrs(iso); if (!isFinite(h)) return ''; if (h < 1 / 60) return 'just now'; if (h < 1) return Math.round(h * 60) + 'm ago'; if (h < 24) return Math.round(h) + 'h ago'; return Math.round(h / 24) + 'd ago'; };
+const dayOf = iso => { const d = new Date(iso), t = new Date(); const k = x => x.toDateString(); if (k(d) === k(t)) return 'Today'; t.setDate(t.getDate() - 1); if (k(d) === k(t)) return 'Yesterday'; return d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' }); };
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2600); }
+const rgb = hex => { const n = parseInt(hex.replace('#', ''), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+const rgba = (hex, a) => { const [r, g, b] = rgb(hex); return `rgba(${r},${g},${b},${a})`; };
+
+const ICONS = {
+  mark: '<path d="M7 3.5h10v17l-5-3.8-5 3.8z"/><path d="M10 8h4"/>',
+  words: '<path d="M4 6h9M4 11h14M4 16h7"/><circle cx="18" cy="6" r="1.6"/><path d="M15 15.5l2 2 4-4"/>',
+  person: '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c1.2-4 4-6 7.5-6s6.3 2 7.5 6"/>',
+  chat: '<path d="M3.5 6.5a2.5 2.5 0 0 1 2.5-2.5h7.5a2.5 2.5 0 0 1 2.5 2.5v4a2.5 2.5 0 0 1-2.5 2.5H9l-3.5 3v-3a2.5 2.5 0 0 1-2-2.5z"/><path d="M18.5 8.2a2.3 2.3 0 0 1 2 2.3v3.7a2.3 2.3 0 0 1-2 2.3v2.5l-3.2-2.5h-3a2.3 2.3 0 0 1-2-1.2"/>',
+  book: '<path d="M5.5 18.5V5.5a2 2 0 0 1 2-2h11v14h-11a2 2 0 0 0 0 4h11"/><path d="M9.5 7.5h5.5"/>',
+  room: '<path d="M6.5 20.5V10a5.5 5.5 0 0 1 11 0v10.5"/><path d="M3.5 20.5h17"/><path d="M14.5 14.8v.01"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  page: '<rect x="4.5" y="3.5" width="15" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  money: '<path d="M3.5 18.5c3.5 0 5-2.5 7-5.5s3.5-5 7-5"/><circle cx="18" cy="6.5" r="2.2"/><path d="M3.5 20.5h17"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/>',
+  tool: '<path d="M14.5 6.5a4 4 0 0 0 5 5l-8.5 8.5a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4l3 3-2.5 2.5"/>',
+  star: '<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
+};
+const icon = k => `<svg viewBox="0 0 24 24">${ICONS[k] || ICONS.link}</svg>`;
+
+// ---------- state ----------
+let W = 0, H = 0, DPR = 1;
+const cv = $('c'), ctx = cv.getContext('2d');
+let S = null;                    // the last /api/web
+let nodes = [], links = [], byPath = {}, center = null, edges = [];
+let changed = new Set(), flagged = new Set(), lastM = {};
+let hover = null, focus = null, pulses = [], lit = new Set(), litUntil = 0;
+const cam = { x: 0, y: 0, z: 1 }, camT = { x: 0, y: 0, z: 1 };
+let AI = '#f2a84b', AI2 = '#ffcf8a';
+const pics = {};
+const stars = Array.from({ length: 220 }, () => ({ x: (Math.random() - .5) * 2600, y: (Math.random() - .5) * 2000, d: .2 + Math.random() * .8, s: Math.random() }));
+
+function resize() { DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; }
+addEventListener('resize', () => { resize(); if (!focus) goHome(); });
+resize();
+
+const loadImg = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
+
+// ---------- the world ----------
+function makeWorld(d) {
+  const N = [], L = [], P = {};
+  const c = { id: '@center', kind: 'center', path: d.center?.path || null, title: d.ai.name, about: d.center?.about, x: 0, y: 0, r: 46, mtime: d.center?.mtime };
+  N.push(c); if (c.path) P[c.path] = c;
+  // boot files sit close to the center
+  d.boot.forEach((b, i) => {
+    const a = -Math.PI / 3 + i * (Math.PI * 2 / Math.max(6, d.boot.length));
+    const n = { id: b.path, kind: 'boot', path: b.path, title: b.title, about: b.about, x: Math.cos(a) * 100, y: Math.sin(a) * 100, r: 7, mtime: b.mtime, parent: c };
+    N.push(n); P[b.path] = n; L.push({ a: c, b: n, k: 'block' });
+  });
+  const rooms = d.rooms, n = rooms.length;
+  const R = n <= 4 ? 300 : n <= 8 ? 330 : 330 + (n - 8) * 22;
+  rooms.forEach((rm, i) => {
+    const a = -Math.PI / 2 + i * (2 * Math.PI / Math.max(1, n));
+    const room = { id: 'room:' + rm.id, kind: 'room', path: rm.path, room: rm, title: rm.title, x: Math.cos(a) * R, y: Math.sin(a) * R, r: 15, ang: a, mtime: rm.mtime, count: rm.blocks.length };
+    N.push(room); if (rm.path) P[rm.path] = room; L.push({ a: c, b: room, k: 'room' });
+    const bl = rm.blocks, m = bl.length;
+    const perRing = 9;
+    bl.forEach((b, j) => {
+      const ring = Math.floor(j / perRing), inRing = Math.min(perRing, m - ring * perRing), k = j % perRing;
+      const spread = Math.min(1.5, .2 + inRing * .16);
+      const ba = a + (inRing === 1 ? 0 : (k / (inRing - 1) - .5) * spread) + ring * .09;
+      const br = 86 + ring * 50 + hash(b.path) * 22;
+      const bn = { id: b.path, kind: 'block', path: b.path, title: b.title, about: b.about, x: room.x + Math.cos(ba) * br, y: room.y + Math.sin(ba) * br, r: 6, mtime: b.mtime, parent: room };
+      N.push(bn); P[b.path] = bn; L.push({ a: room, b: bn, k: 'block' });
+      b.support.forEach((s, q) => {
+        const sa = ba + (q - (b.support.length - 1) / 2) * .5, sr = 18 + q * 2;
+        const sn = { id: s.path, kind: 'support', path: s.path, title: s.title, about: s.about, x: bn.x + Math.cos(sa) * sr, y: bn.y + Math.sin(sa) * sr, r: 2.6, mtime: s.mtime, parent: bn };
+        N.push(sn); P[s.path] = sn; L.push({ a: bn, b: sn, k: 'support' });
+      });
+    });
+  });
+  for (const t of d.threads) { const a = P[t.from], b = P[t.to]; if (a && b && a !== b && a.kind !== 'center' && b.kind !== 'center') L.push({ a, b, k: 'thread' }); }
+  const FR = R + 250;
+  const E = d.edges.map((e, i) => { const a = Math.PI * (.25 + i * 2 / Math.max(3, d.edges.length)); return { id: 'edge:' + i, kind: 'edge', title: e.name, color: e.color || '#8fb4ff', pic: e.picture ? '/api/picture/' + e.i : null, x: Math.cos(a) * FR, y: Math.sin(a) * FR, r: 26 }; });
+  for (const e of E) { N.push(e); L.push({ a: c, b: e, k: 'edge' }); }
+  return { N, L, P, c, E };
+}
+
+const curve = (a, b, bend) => { const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y; return { cx: mx - dy * bend, cy: my + dx * bend }; };
+const qpt = (a, c, b, t) => ({ x: (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * c.cx + t * t * b.x, y: (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * c.cy + t * t * b.y });
+function glow(x, y, r, col, a) { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col.replace('A', a)); g.addColorStop(1, col.replace('A', 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); }
+const AMB = () => rgba(AI, 'A').replace(/,A\)$/, ',A)');
+function portrait(img, x, y, r, col, ring) {
+  ctx.save(); ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.closePath(); ctx.fillStyle = '#0c0d12'; ctx.fill(); ctx.clip();
+  if (img) { const s = Math.max(2 * r / img.width, 2 * r / img.height); ctx.drawImage(img, x - img.width * s / 2, y - img.height * s / 2, img.width * s, img.height * s); }
+  ctx.restore(); ctx.lineWidth = 2 / cam.z; ctx.strokeStyle = rgba(col, ring); ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
+}
+
+// ---------- camera ----------
+function sideW() { return innerWidth > 980 ? 340 + 20 : 0; }
+function navW() { return innerWidth > 980 ? 292 + 20 : 0; }
+function fit() {
+  if (!nodes.length) return { x: 0, y: 0, z: 1 };
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const n of nodes) { x0 = Math.min(x0, n.x - 40); x1 = Math.max(x1, n.x + 40); y0 = Math.min(y0, n.y - 40); y1 = Math.max(y1, n.y + 50); }
+  const l = navW() + 10, r = W - sideW() - 10, t = 70, b = H - 20;
+  const z = Math.max(.3, Math.min(1.15, (r - l) / (x1 - x0), (b - t) / (y1 - y0)));
+  const cxScreen = (l + r) / 2, cyScreen = (t + b) / 2;
+  return { z, x: (x0 + x1) / 2 - (cxScreen - W / 2) / z, y: (y0 + y1) / 2 - (cyScreen - H / 2) / z };
+}
+function goHome() { Object.assign(camT, fit()); }
+const toScreen = n => ({ x: (n.x - cam.x) * cam.z + W / 2, y: (n.y - cam.y) * cam.z + H / 2 });
+const toWorld = (sx, sy) => ({ x: (sx - W / 2) / cam.z + cam.x, y: (sy - H / 2) / cam.z + cam.y });
+function flyTo(n) {
+  const readerW = Math.min(640, W - 360) + 20;
+  const z = Math.max(cam.z, 1.3);
+  const freeCenter = (W - readerW) / 2;
+  Object.assign(camT, { z, x: n.x - (freeCenter - W / 2) / z, y: n.y });
+}
+
+// ---------- drawing ----------
+const t0 = performance.now();
+function frame(now) {
+  const T = (now - t0) / 1000;
+  for (const k of ['x', 'y', 'z']) cam[k] += (camT[k] - cam[k]) * .085;
+  const z = cam.z;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#06070b'; ctx.fillRect(0, 0, W, H);
+  const [ar, ag, ab] = rgb(AI);
+  const bg = ctx.createRadialGradient(W / 2 - cam.x * z * .15, H / 2 - cam.y * z * .15, 0, W / 2, H / 2, Math.max(W, H) * .75);
+  bg.addColorStop(0, `rgba(${ar * .2 | 0},${ag * .2 | 0},${ab * .2 | 0},.6)`); bg.addColorStop(.45, 'rgba(14,16,26,.4)'); bg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  for (const s of stars) { const px = W / 2 + (s.x - cam.x * s.d) * z * s.d * .6, py = H / 2 + (s.y - cam.y * s.d) * z * s.d * .6; if (px < 0 || py < 0 || px > W || py > H) continue; const tw = .35 + .65 * Math.abs(Math.sin(T * .6 + s.s * 20)); ctx.fillStyle = `rgba(${s.s > .8 ? '255,214,170' : '170,185,220'},${(.12 + s.d * .35) * tw})`; ctx.fillRect(px, py, s.d > .6 ? 1.6 : 1, s.d > .6 ? 1.6 : 1); }
+
+  ctx.setTransform(DPR * z, 0, 0, DPR * z, DPR * (W / 2 - cam.x * z), DPR * (H / 2 - cam.y * z));
+  const ref = Date.now();
+  const fresh = iso => iso ? Math.exp(-Math.max(0, (ref - Date.parse(iso)) / 36e5) / 6) : 0;
+  const isLit = n => (litUntil > now && lit.has(n.path)) || hover === n || focus === n;
+  const near = n => hover && (n === hover || n.parent === hover || hover.parent === n);
+  const A1 = rgba(AI, 'A'), A2 = rgba(AI2, 'A');
+
+  // links
+  ctx.globalCompositeOperation = 'lighter';
+  for (const { a, b, k } of links) {
+    const c = curve(a, b, k === 'thread' ? .25 : k === 'edge' ? .06 : .1);
+    const f = Math.max(fresh(a.mtime), fresh(b.mtime));
+    let al = k === 'thread' ? .07 : k === 'edge' ? .08 : k === 'support' ? .08 : .07 + .22 * f;
+    if (near(a) || near(b) || isLit(b)) al += .28;
+    ctx.strokeStyle = k === 'edge' ? rgba(b.color, al) : k === 'thread' ? `rgba(200,210,235,${al})` : rgba(AI, al);
+    ctx.lineWidth = (k === 'room' ? 1.4 * (1 + f) : 1) / z;
+    if (k === 'thread') ctx.setLineDash([3 / z, 6 / z]);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(c.cx, c.cy, b.x, b.y); ctx.stroke(); ctx.setLineDash([]);
+    if (k === 'room' || k === 'edge') {
+      const cnt = k === 'edge' ? 2 : 1 + Math.round(f * 3);
+      for (let i = 0; i < cnt; i++) {
+        let t = (T * (k === 'edge' ? .06 : .09) + i / cnt + hash(b.id)) % 1; if (k === 'edge') t = 1 - t;
+        const p = qpt(a, c, b, t); const col = k === 'edge' ? b.color : AI2;
+        ctx.fillStyle = rgba(col, .9); ctx.beginPath(); ctx.arc(p.x, p.y, (1.6 + f) / z, 0, 7); ctx.fill();
+        glow(p.x, p.y, 7 / z, rgba(col, 'A'), .25);
+      }
+    }
+  }
+
+  // nodes
+  for (const n of nodes) {
+    if (n.kind === 'center' || n.kind === 'edge') continue;
+    const f = fresh(n.mtime), L = isLit(n) || near(n);
+    const ch = changed.has(n.path) || (n.kind === 'room' && n.room.blocks.some(b => changed.has(b.path) || b.support.some(s => changed.has(s.path))));
+    const r = n.r * (L ? 1.25 : 1) * (ch && n.kind !== 'room' ? 1.25 : 1);
+    if (ch) { // changed since they looked: a warm, slow-breathing halo
+      const br = .5 + .5 * Math.sin(T * 1.15 + hash(n.id) * 6);
+      glow(n.x, n.y, r * (5 + 1.4 * br) + 10, 'rgba(255,214,160,A)', .2 + .14 * br); glow(n.x, n.y, r * 2.4, 'rgba(255,214,160,A)', .3);
+      ctx.lineWidth = 1.2 / z; ctx.strokeStyle = `rgba(255,214,160,${.2 + .22 * br})`; ctx.beginPath(); ctx.arc(n.x, n.y, r + 5 + 3 * br, 0, 7); ctx.stroke();
+    }
+    if (flagged.has(n.path)) { ctx.lineWidth = 1.6 / z; ctx.strokeStyle = 'rgba(232,143,180,.9)'; ctx.beginPath(); ctx.arc(n.x, n.y, r + 4 / z + 2, 0, 7); ctx.stroke(); glow(n.x, n.y, r * 2.6, 'rgba(232,143,180,A)', .22); }
+    glow(n.x, n.y, r * (2 + 2.2 * f) + (L ? 8 : 0), A1, (.05 + .2 * f) + (L ? .22 : 0));
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = n.kind === 'room' ? '#0d0f16' : '#120f0b'; ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 7); ctx.fill();
+    ctx.lineWidth = (n.kind === 'room' ? 1.6 : 1.2) / z; ctx.strokeStyle = rgba(AI2, .25 + .7 * f + (L ? .3 : 0)); ctx.stroke();
+    ctx.fillStyle = `rgba(255,${190 + 40 * f | 0},${120 + 60 * f | 0},${.35 + .65 * f})`; ctx.beginPath(); ctx.arc(n.x, n.y, r * (n.kind === 'room' ? .38 : .5), 0, 7); ctx.fill();
+    ctx.globalCompositeOperation = 'lighter';
+  }
+  ctx.globalCompositeOperation = 'source-over';
+
+  // pulses: a save travels from the center out to the block
+  pulses = pulses.filter(p => p.t < 1.6).slice(-60);
+  for (const p of pulses) {
+    p.t += .012; const n = p.n;
+    const route = [center]; if (n.parent && n.parent !== center) { if (n.parent.parent && n.parent.parent !== center) route.push(n.parent.parent); route.push(n.parent); } route.push(n);
+    const seg = Math.min(.999, p.t) * (route.length - 1), i = Math.floor(seg), tt = seg - i;
+    ctx.globalCompositeOperation = 'lighter';
+    if (p.t < 1) { const a = route[i], b = route[i + 1], c = curve(a, b, .1), q = qpt(a, c, b, tt); glow(q.x, q.y, 22 / z, A2, .9); ctx.fillStyle = '#fff3dc'; ctx.beginPath(); ctx.arc(q.x, q.y, 3 / z, 0, 7); ctx.fill(); }
+    else { const k = (p.t - 1) / .6; ctx.strokeStyle = rgba(AI2, 1 - k); ctx.lineWidth = 2 / z; ctx.beginPath(); ctx.arc(n.x, n.y, n.r + k * 40, 0, 7); ctx.stroke(); glow(n.x, n.y, 40, A2, .5 * (1 - k)); }
+  }
+  ctx.globalCompositeOperation = 'source-over';
+
+  // the other agents or people on the outer ring, if any
+  for (const e of edges) {
+    const L = isLit(e) || near(e), r = e.r * (L ? 1.12 : 1);
+    ctx.globalCompositeOperation = 'lighter'; glow(e.x, e.y, r * 3, rgba(e.color, 'A'), L ? .38 : .16); ctx.globalCompositeOperation = 'source-over';
+    if (e.pic && pics[e.pic]) portrait(pics[e.pic], e.x, e.y, r, e.color, L ? .9 : .55);
+    else { ctx.fillStyle = rgba(e.color, .18); ctx.beginPath(); ctx.arc(e.x, e.y, r, 0, 7); ctx.fill(); ctx.lineWidth = 2 / z; ctx.strokeStyle = rgba(e.color, .7); ctx.stroke(); ctx.fillStyle = e.color; ctx.font = `600 ${r * .8}px ${getComputedStyle(document.body).fontFamily}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText((e.title || '?')[0].toUpperCase(), e.x, e.y + 1); ctx.textBaseline = 'alphabetic'; }
+  }
+
+  // the AI, at the center
+  if (center) {
+    const br = 1 + .03 * Math.sin(T * 1.3);
+    ctx.globalCompositeOperation = 'lighter'; glow(0, 0, 150 * br, A1, .16 + .14 * fresh(center.mtime)); glow(0, 0, 70, A2, .12); ctx.globalCompositeOperation = 'source-over';
+    ctx.lineWidth = 1.4 / z; ctx.strokeStyle = rgba(AI, .45); ctx.setLineDash([10 / z, 7 / z]); ctx.beginPath(); ctx.arc(0, 0, center.r + 10, -T * .2, -T * .2 + 7); ctx.stroke(); ctx.setLineDash([]);
+    if (changed.has(center.path)) { const b2 = .5 + .5 * Math.sin(T * 1.15); ctx.strokeStyle = `rgba(255,214,160,${.25 + .25 * b2})`; ctx.lineWidth = 2 / z; ctx.beginPath(); ctx.arc(0, 0, center.r + 18 + 3 * b2, 0, 7); ctx.stroke(); }
+    if (flagged.has(center.path)) { ctx.strokeStyle = 'rgba(232,143,180,.9)'; ctx.lineWidth = 2 / z; ctx.beginPath(); ctx.arc(0, 0, center.r + 4, 0, 7); ctx.stroke(); }
+    portrait(pics.ai, 0, 0, center.r * (isLit(center) ? 1.06 : 1), AI, .95);
+  }
+
+  // labels, in screen space so they stay crisp
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const FONT = getComputedStyle(document.body).fontFamily;
+  ctx.textAlign = 'center';
+  for (const n of nodes) {
+    const L = isLit(n) || near(n), s = toScreen(n);
+    if (n.kind === 'room') {
+      const cx = Math.cos(n.ang), sy = Math.sin(n.ang), side = cx > .35 ? 1 : cx < -.35 ? -1 : 0, off = n.r * z + 12;
+      ctx.textAlign = side > 0 ? 'left' : side < 0 ? 'right' : 'center';
+      const lx = s.x + side * off, ly = side ? s.y - 2 : s.y + (sy < 0 ? -off - 12 : off + 12);
+      ctx.font = '600 14px ' + FONT; ctx.fillStyle = L ? '#fff1dc' : 'rgba(225,229,237,.9)'; ctx.fillText(n.title, lx, ly);
+      ctx.font = '12px ' + FONT; ctx.fillStyle = 'rgba(140,146,160,.9)'; ctx.fillText(n.count ? n.count + (n.count > 1 ? ' blocks' : ' block') : 'empty', lx, ly + 16);
+      ctx.textAlign = 'center';
+    } else if ((n.kind === 'block' || n.kind === 'boot') && (z > 1.25 || L || changed.has(n.path) || n.kind === 'boot')) {
+      ctx.font = (L ? '600 ' : '') + '13px ' + FONT; ctx.fillStyle = L ? '#fff1dc' : changed.has(n.path) ? 'rgba(255,224,185,.95)' : 'rgba(205,209,219,.75)'; ctx.fillText(n.title, s.x, s.y - n.r * z - 9);
+    } else if (n.kind === 'edge') { ctx.font = '600 13px ' + FONT; ctx.fillStyle = n.color; ctx.fillText(n.title, s.x, s.y + n.r * z + 20); }
+    else if (n.kind === 'center') { ctx.font = '600 15px ' + FONT; ctx.fillStyle = AI2; ctx.fillText(n.title, s.x, s.y + n.r * z + 28); }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- picking ----------
+function pick(sx, sy) {
+  const w = toWorld(sx, sy); let best = null, bd = 1e9;
+  for (const n of nodes) { const d = Math.hypot(n.x - w.x, n.y - w.y); const hit = Math.max(n.r + 6, 14 / cam.z); if (d < hit && d < bd) { best = n; bd = d; } }
+  return best;
+}
+let drag = null;
+cv.addEventListener('mousedown', e => { drag = { x: e.clientX, y: e.clientY, cx: camT.x, cy: camT.y, moved: false }; });
+addEventListener('mouseup', e => {
+  if (drag && !drag.moved) { const n = pick(e.clientX, e.clientY); if (n) openNode(n); }
+  drag = null; cv.classList.remove('drag');
+});
+addEventListener('mousemove', e => {
+  if (drag) {
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.hypot(dx, dy) > 4) { drag.moved = true; cv.classList.add('drag'); }
+    if (drag.moved) { camT.x = drag.cx - dx / cam.z; camT.y = drag.cy - dy / cam.z; cam.x = camT.x; cam.y = camT.y; }
+    return;
+  }
+  if (e.target !== cv) { if (hover) { hover = null; untip(); } return; }
+  const n = pick(e.clientX, e.clientY);
+  if (n !== hover) { hover = n; cv.classList.toggle('point', !!n); n ? tip(n, e) : untip(); }
+  else if (n) placeTip(e);
+});
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const before = toWorld(e.clientX, e.clientY);
+  camT.z = Math.max(.25, Math.min(4, camT.z * Math.exp(-e.deltaY * .0015)));
+  cam.z = camT.z;
+  const after = toWorld(e.clientX, e.clientY);
+  camT.x += before.x - after.x; camT.y += before.y - after.y; cam.x = camT.x; cam.y = camT.y;
+}, { passive: false });
+// touch: one finger pans, a tap opens
+let touch = null;
+cv.addEventListener('touchstart', e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY, cx: camT.x, cy: camT.y, moved: false }; }, { passive: true });
+cv.addEventListener('touchmove', e => { if (!touch) return; const t = e.touches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y; if (Math.hypot(dx, dy) > 6) touch.moved = true; camT.x = touch.cx - dx / cam.z; camT.y = touch.cy - dy / cam.z; }, { passive: true });
+cv.addEventListener('touchend', () => { if (touch && !touch.moved) { const n = pick(touch.x, touch.y); if (n) openNode(n); } touch = null; });
+
+function tip(n, e) {
+  const word = S?.words?.[n.path];
+  const what = n.kind === 'room' ? `${n.count} block${n.count === 1 ? '' : 's'}` : n.kind === 'center' ? (n.path ? 'The center: ' + n.path : '') : n.kind === 'edge' ? '' : n.path;
+  $('tip').innerHTML = `<b>${esc(n.title)}</b>${word ? `<div class="w">“${esc(word)}”</div>` : ''}${n.about ? `<small>${esc(n.about)}</small>` : ''}${what ? `<small>${esc(what)}</small>` : ''}${changed.has(n.path) ? '<small style="color:var(--glow)">Changed since you looked</small>' : ''}${flagged.has(n.path) ? '<small style="color:var(--flag)">⚑ Flagged, waiting on your AI</small>' : ''}`;
+  $('tip').classList.add('on'); placeTip(e);
+}
+function placeTip(e) { const el = $('tip'); el.style.left = Math.min(W - el.offsetWidth - 10, e.clientX + 16) + 'px'; el.style.top = Math.min(H - el.offsetHeight - 10, e.clientY + 16) + 'px'; }
+function untip() { $('tip').classList.remove('on'); }
+
+// ---------- the reader ----------
+let readerPath = null, readerTab = 'block', readerData = null, selQuote = '';
+function openNode(n) {
+  untip();
+  if (n.kind === 'edge') { toast(`${n.title} sits at the edge of the web. Their own memory isn't drawn here.`); return; }
+  focus = n; flyTo(n);
+  if (n.path) return openBlock(n.path);
+  if (n.kind === 'room') return openRoom(n);
+  if (n.kind === 'center') return showReader({ path: '', title: n.title, html: `<h1>${esc(n.title)}</h1><p>The brain has no DESK.md, INDEX.md or README.md at its top, so there's nothing at the center to open yet.</p>` });
+}
+function openRoom(n) {
+  const rm = n.room;
+  const html = `<h1>${esc(rm.title)}</h1><p style="color:var(--muted)">${rm.blocks.length} block${rm.blocks.length === 1 ? '' : 's'} in <code>${esc(rm.id)}/</code></p>` +
+    rm.blocks.map(b => `<p><span class="link" data-ref="${esc(b.path)}">${esc(b.title)}</span>${changed.has(b.path) ? ' <span style="color:var(--glow)">· changed</span>' : ''}<br><small style="color:var(--muted)">${esc(b.about || b.path)}</small></p>`).join('');
+  showReader({ path: rm.id + '/', title: rm.title, html });
+}
+function showReader({ path, html, tabs = '' }) {
+  readerPath = path || null;
+  $('rpath').textContent = path || '';
+  const word = path && S?.words?.[path];
+  $('rword').innerHTML = word ? `<span class="chip word" title="Saying this word to your AI opens this block">“${esc(word)}”</span>` : '';
+  $('rflag').style.display = path && path.endsWith('.md') ? '' : 'none';
+  $('tabs').innerHTML = tabs; $('tabs').style.display = tabs ? '' : 'none';
+  $('rbody').innerHTML = html; $('rbody').scrollTop = 0;
+  wireLinks($('rbody'));
+  $('reader').classList.add('on'); $('side').style.opacity = 0;
+  selQuote = ''; flagLabel();
+}
+async function openBlock(p, tab) {
+  const n = byPath[p]; if (n && focus !== n) { focus = n; flyTo(n); }
+  let d; try { d = await j('/api/block?path=' + encodeURIComponent(p)); } catch { d = null; }
+  if (!d || d.error) { toast("That block isn't in the brain anymore."); return; }
+  readerData = d;
+  const hasDiff = d.changed && d.history?.git && d.history.diff;
+  readerTab = tab || (hasDiff ? 'changed' : 'block');
+  renderBlock();
+  // looking at it is what clears the glow
+  clearTimeout(openBlock.t);
+  if (d.changed) openBlock.t = setTimeout(async () => { if (readerPath !== p) return; await post('/api/seen', { path: p }); changed.delete(p); renderSide(); renderSince(); }, 2500);
+}
+function renderBlock() {
+  const d = readerData; if (!d) return;
+  const h = d.history || {};
+  const hasDiff = d.changed && h.git && h.diff;
+  const tabs = hasDiff ? `<button data-tab="changed" class="glowtab ${readerTab === 'changed' ? 'on' : ''}">What changed</button><button data-tab="block" class="${readerTab === 'block' ? 'on' : ''}">The block</button>` : '';
+  const flags = (S?.flags || []).filter(f => f.path === d.path);
+  const done = (doneFlags || []).filter(f => f.path === d.path).slice(0, 3);
+  let top = flags.map(f => `<div class="flagbox" data-id="${esc(f.id)}"><div class="fh"><span>⚑ Flagged ${ago(f.at)}, waiting on your AI</span><button data-take="${esc(f.id)}">Take it back</button></div>${f.quote ? `<blockquote>${esc(f.quote)}</blockquote>` : ''}<textarea data-note="${esc(f.id)}" placeholder="What's off? Write as much as you like; it saves as you type.">${esc(f.note || '')}</textarea><div class="st" data-st="${esc(f.id)}">${f.note ? 'Saved.' : ''} Your AI fixes it when it next looks at its flags.</div></div>`).join('');
+  top += done.map(f => `<div class="flagbox done"><div class="fh"><span>✓ Fixed ${ago(f.done)}</span></div>${f.note ? `<div style="color:var(--muted);font-size:14px;margin-top:6px">You said: ${esc(f.note)}</div>` : ''}<div class="ans">${esc(f.what)}</div></div>`).join('');
+  let body;
+  if (readerTab === 'changed' && hasDiff) {
+    body = h.diff === 'NEW' ? `<p style="color:var(--glow)">This block is new since you last looked.</p>` + md(d.text) : `<p style="color:var(--muted)">What your AI changed here since you last looked. Green is new, red is gone.</p>` + diffHtml(h.diff);
+  } else {
+    body = md(d.text);
+    if (d.changed && !hasDiff) body = `<p style="color:var(--glow)">Changed ${ago(d.mtime)}, since you last looked.</p>` + body;
+  }
+  if (h.git && h.commits?.length) body += `<div class="commits"><div style="color:var(--faint)">Saves to this block</div>${h.commits.map(c => `<div>${esc(new Date(c.date).toLocaleDateString([], { month: 'short', day: 'numeric' }))} · ${esc(c.subject)}</div>`).join('')}</div>`;
+  showReader({ path: d.path, html: top + body, tabs });
+  $('tabs').querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { readerTab = b.dataset.tab; renderBlock(); });
+  $('rbody').querySelectorAll('[data-note]').forEach(t => t.oninput = () => saveNote(t.dataset.note, t.value));
+  $('rbody').querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { await post('/api/flag/remove', { id: b.dataset.take }); await refresh(); renderBlock(); toast('Flag taken back.'); });
+}
+function closeReader() { $('reader').classList.remove('on'); $('side').style.opacity = 1; readerPath = null; readerData = null; focus = null; goHome(); }
+$('rclose').onclick = closeReader;
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if ($('reader').classList.contains('on')) closeReader(); else { $('q').value = ''; renderNav(); } }
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { e.preventDefault(); $('q').focus(); }
+});
+
+// ⚑ flags: select a passage first to flag just that part
+document.addEventListener('selectionchange', () => {
+  const s = getSelection(); if (!s || !readerPath) return;
+  const inBody = s.anchorNode && $('rbody').contains(s.anchorNode) && !(s.anchorNode.parentElement?.closest('.flagbox'));
+  selQuote = inBody ? s.toString().trim().slice(0, 2000) : '';
+  flagLabel();
+});
+function flagLabel() { $('rflag').textContent = selQuote ? '⚑ Flag this part' : '⚑ Flag'; }
+$('rflag').onmousedown = e => e.preventDefault(); // keep the selection
+$('rflag').onclick = async () => {
+  if (!readerPath) return;
+  const f = await post('/api/flag', { path: readerPath, quote: selQuote });
+  if (f.error) return toast(f.error);
+  getSelection().removeAllRanges(); selQuote = '';
+  await refresh(); renderBlock();
+  const t = $('rbody').querySelector(`[data-note="${f.id}"]`); if (t) { t.focus(); t.scrollIntoView({ block: 'center' }); }
+  toast('Flagged. Add a word about what\'s off, if you like.');
+};
+const noteTimers = {};
+function saveNote(id, text) {
+  clearTimeout(noteTimers[id]);
+  const st = document.querySelector(`[data-st="${id}"]`); if (st) st.textContent = 'Saving…';
+  noteTimers[id] = setTimeout(async () => { await post('/api/flag/note', { id, note: text }); const f = (S?.flags || []).find(x => x.id === id); if (f) f.note = text; const st2 = document.querySelector(`[data-st="${id}"]`); if (st2) st2.textContent = 'Saved. Your AI fixes it when it next looks at its flags.'; renderSide(); }, 600);
+}
+
+// ---------- markdown, small and forgiving ----------
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, (m, c) => /\.md$/i.test(c) && resolve(c) ? `<code class="link" data-ref="${esc(resolve(c))}">${c}</code>` : `<code>${c}</code>`)
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => { const r = resolve(u.replace(/&amp;/g, '&')); return r ? `<span class="link" data-ref="${esc(r)}">${t}</span>` : /^https?:/.test(u) ? `<a href="${u}" target="_blank" rel="noopener">${t}</a>` : t; })
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*\w])\*([^*\n]+)\*(?!\w)/g, '$1<em>$2</em>');
+}
+function resolve(ref) {
+  if (!S) return null;
+  let p = ref.trim().replace(/^\.\//, '').replace(/[#?].*$/, '').replace(/^memory\//, '');
+  if (byPath[p]) return p;
+  if (readerPath) { const dir = readerPath.split('/').slice(0, -1); const parts = [...dir, ...p.split('/')]; const out = []; for (const x of parts) { if (x === '..') out.pop(); else if (x && x !== '.') out.push(x); } const q = out.join('/'); if (byPath[q]) return q; }
+  return null;
+}
+function md(src) {
+  const lines = String(src).replace(/\r/g, '').split('\n'); let out = '', i = 0;
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^```/.test(l)) { let code = ''; i++; while (i < lines.length && !/^```/.test(lines[i])) code += lines[i++] + '\n'; i++; out += `<pre><code>${esc(code)}</code></pre>`; continue; }
+    const h = l.match(/^(#{1,6})\s+(.*)$/); if (h) { const lv = Math.min(3, h[1].length); out += `<h${lv}>${inline(h[2])}</h${lv}>`; i++; continue; }
+    if (/^\s*(---|\*\*\*)\s*$/.test(l)) { out += '<hr>'; i++; continue; }
+    if (/^\s*\|/.test(l)) { const rows = []; while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]); const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim()); const body = rows.filter(r => !/^\s*\|[\s:|-]+\|\s*$/.test(r)); out += '<table>' + body.map((r, k) => `<tr>${cells(r).map(c => k === 0 && rows.length > 1 && /^\s*\|[\s:|-]+\|\s*$/.test(rows[1]) ? `<th>${inline(c)}</th>` : `<td>${inline(c)}</td>`).join('')}</tr>`).join('') + '</table>'; continue; }
+    if (/^\s*>/.test(l)) { let q = ''; while (i < lines.length && /^\s*>/.test(lines[i])) q += lines[i++].replace(/^\s*>\s?/, '') + ' '; out += `<blockquote>${inline(q)}</blockquote>`; continue; }
+    if (/^\s*([-*+]|\d+\.)\s+/.test(l)) {
+      const ordered = /^\s*\d+\./.test(l); let items = [];
+      while (i < lines.length && (/^\s*([-*+]|\d+\.)\s+/.test(lines[i]) || (/^\s{2,}\S/.test(lines[i]) && items.length))) {
+        if (/^\s*([-*+]|\d+\.)\s+/.test(lines[i])) items.push(lines[i].replace(/^\s*([-*+]|\d+\.)\s+/, '')); else items[items.length - 1] += ' ' + lines[i].trim();
+        i++;
+      }
+      out += `<${ordered ? 'ol' : 'ul'}>${items.map(x => `<li>${inline(x)}</li>`).join('')}</${ordered ? 'ol' : 'ul'}>`; continue;
+    }
+    if (!l.trim()) { i++; continue; }
+    let p = l; i++; while (i < lines.length && lines[i].trim() && !/^(#{1,6}\s|```|\s*[-*+]\s|\s*\d+\.\s|\s*\||\s*>)/.test(lines[i])) p += ' ' + lines[i++].trim();
+    out += `<p>${inline(p)}</p>`;
+  }
+  return out;
+}
+// The diff, read as words: new lines lit, old lines struck through, a little context around them.
+function diffHtml(d) {
+  const say = l => { const t = l.replace(/^\s*([-*+]|\d+\.)\s+/, '').replace(/^#+\s*/, ''); return t.trim() ? inline(t) : ''; };
+  let out = '', gap = false;
+  for (const l of d.split('\n')) {
+    if (/^(diff --git|index |--- |\+\+\+ |new file|deleted file|\\ No newline)/.test(l)) continue;
+    if (l.startsWith('@@')) { if (out) gap = true; continue; }
+    const t = say(l.slice(1)); if (!t) continue;
+    if (gap) { out += '<span class="h">…</span>'; gap = false; }
+    out += l[0] === '+' ? `<span class="a">${t}</span>` : l[0] === '-' ? `<span class="d">${t}</span>` : `<span class="c">${t}</span>`;
+  }
+  return `<div class="diff">${out || '<span class="c">Only spacing changed.</span>'}</div>`;
+}
+function wireLinks(el) { el.querySelectorAll('[data-ref]').forEach(a => a.onclick = () => openBlock(a.dataset.ref)); }
+
+// ---------- the left side: theirs ----------
+let NAV = null;
+function itemHtml(it, disabled) {
+  const exists = !it.block || byPath[it.block];
+  if (!exists) return '';
+  const inner = `<span class="ic">${icon(it.icon || (it.block ? 'book' : 'link'))}</span><span class="t"><div>${esc(it.name)}</div>${it.sub ? `<div class="sub">${esc(it.sub)}</div>` : ''}</span>`;
+  if (it.block) return `<button class="item" data-ref="${esc(it.block)}">${inner}</button>`;
+  const local = /^\//.test(it.url || '');
+  return `<a class="item" href="${esc(it.url || '#')}"${local ? '' : ' target="_blank" rel="noopener"'}>${inner}</a>`;
+}
+function groupsHtml(groups) { return groups.map(g => `<div class="group">${esc(g.name)}</div>${(g.items || []).map(it => itemHtml(it)).join('')}${!(g.items || []).length && g.empty ? `<div class="empty">${esc(g.empty)}</div>` : ''}`).join(''); }
+function renderNav() {
+  const q = $('q').value.trim().toLowerCase();
+  let h = '';
+  if (q) {
+    const all = nodes.filter(n => n.path && (n.title.toLowerCase().includes(q) || n.path.toLowerCase().includes(q) || (S.words[n.path] || '').toLowerCase().includes(q) || (n.about || '').toLowerCase().includes(q))).slice(0, 30);
+    h = `<div class="group">In the brain</div>` + (all.map(n => `<button class="item" data-ref="${esc(n.path)}"><span class="ic">${icon(n.kind === 'room' ? 'room' : 'book')}</span><span class="t"><div>${esc(n.title)}</div><div class="sub">${esc(S.words[n.path] ? '“' + S.words[n.path] + '” · ' : '')}${esc(n.path)}</div></span></button>`).join('') || `<div class="empty">Nothing matches “${esc(q)}”.</div>`);
+  } else if (NAV?.mine) {
+    h = groupsHtml(NAV.mine.groups || []);
+  } else if (NAV) {
+    h = `<div class="yours"><b>This side is yours.</b>Put whatever you reach for here: your AI's pages, the sites you open every day, the blocks you check most. Ask your AI to add things, or start from this set and change it later.<br><button class="use" id="usesug">Use this set</button></div><div class="suggested">${groupsHtml(NAV.suggested.groups || [])}</div>`;
+  }
+  $('navlist').innerHTML = h;
+  $('navlist').querySelectorAll('[data-ref]').forEach(b => b.onclick = () => { const n = byPath[b.dataset.ref]; n ? openNode(n) : openBlock(b.dataset.ref); });
+  const u = $('usesug'); if (u) u.onclick = async () => { NAV = await post('/api/nav/use-suggested'); renderNav(); toast('Done. Your AI can change it any time.'); };
+}
+$('q').addEventListener('input', renderNav);
+
+// ---------- the right side: what's waiting ----------
+let doneFlags = [], saves = [];
+function renderSide() {
+  const ch = [...changed].map(p => byPath[p]).filter(Boolean);
+  const open = S?.flags || [];
+  let h = '';
+  h += `<div class="sec"><h3><span>Changed since you looked</span>${ch.length ? '<button id="seenall">Seen all</button>' : ''}</h3>` +
+    (ch.length ? ch.map(n => `<button class="row glow" data-ref="${esc(n.path)}"><b>${esc(n.title)}</b><small>${esc(n.parent?.title && n.parent.kind === 'room' ? n.parent.title + ' · ' : '')}${ago(n.mtime)}</small></button>`).join('')
+      : `<div class="quiet">Nothing new. When your AI saves to its memory, the block glows here and on the web until you've looked.</div>`) + '</div>';
+  h += `<div class="sec"><h3><span>Flags</span></h3>` +
+    (open.length ? open.map(f => `<button class="row flag" data-ref="${esc(f.path)}"><b>${esc(byPath[f.path]?.title || f.path)}</b><small>${esc(f.note || f.quote || 'No words yet')}</small></button>`).join('') : '') +
+    doneFlags.slice(0, 3).map(f => `<button class="row done" data-ref="${esc(f.path)}"><b>✓ ${esc(byPath[f.path]?.title || f.path)}</b><small class="what">${esc(f.what)}</small></button>`).join('') +
+    (!open.length && !doneFlags.length ? `<div class="quiet">Open any block and tap ⚑ when something's wrong, old or tangled. Select a passage first to flag just that part. Your AI fixes it and answers here.</div>` : '') + '</div>';
+  h += `<div class="sec"><h3><span>Recent saves</span></h3>`;
+  let last = '';
+  for (const s of saves.slice(0, 14)) {
+    const day = dayOf(s.date); if (day !== last) { h += `<div class="day">${day}</div>`; last = day; }
+    const names = s.paths.map(p => byPath[p]?.title || p.split('/').pop().replace(/\.md$/, ''));
+    h += `<button class="row save" data-paths="${esc(s.paths.join('|'))}"><b>${esc(s.subject || names[0])}</b><small class="paths">${esc(names.join(', '))} · ${ago(s.date)}</small></button>`;
+  }
+  if (!saves.length) h += `<div class="quiet">No saves this week.</div>`;
+  h += '</div>';
+  $('sidebody').innerHTML = h;
+  $('sidebody').querySelectorAll('[data-ref]').forEach(b => b.onclick = () => { const n = byPath[b.dataset.ref]; n ? openNode(n) : openBlock(b.dataset.ref); });
+  $('sidebody').querySelectorAll('[data-paths]').forEach(b => {
+    b.onclick = () => replay(b.dataset.paths.split('|'));
+    b.onmouseenter = () => { lit = new Set(b.dataset.paths.split('|')); litUntil = performance.now() + 1e9; };
+    b.onmouseleave = () => { litUntil = 0; };
+  });
+  const sa = $('seenall'); if (sa) sa.onclick = async () => { await post('/api/seen', {}); changed.clear(); renderSide(); renderSince(); toast('All caught up.'); };
+}
+function replay(paths) { paths.forEach((p, i) => { const n = byPath[p]; if (n) setTimeout(() => pulses.push({ n, t: 0 }), i * 160); }); }
+function renderSince() {
+  const n = changed.size, b = $('since');
+  b.classList.toggle('on', n > 0);
+  b.textContent = n === 1 ? '1 change since you looked' : `${n} changes since you looked`;
+}
+$('since').onclick = () => { lit = new Set(changed); litUntil = performance.now() + 4000; replay([...changed]); if (innerWidth <= 980) $('side').classList.add('open'); };
+
+// ---------- welcome: whose picture is in the middle ----------
+function renderWelcome() {
+  const el = $('welcome');
+  if (!S || NAV?.welcomeDismissed || (!S.ai.placeholder && !S.example)) { el.classList.remove('on'); return; }
+  $('wimg').src = '/api/picture/ai';
+  $('wtitle').textContent = S.ai.placeholder ? "That's Odie in the middle." : 'This is an example brain.';
+  $('wtext').innerHTML = (S.ai.placeholder ? `<p>Odie is the AI this Homebase was built with. Your AI's name and picture go in the middle: ask it to put itself there.</p>` : '') +
+    (S.example ? `<p>You're looking at an example brain. Your AI points Homebase at its own memory during setup, and then this web is yours.</p>` : `<p>The web around it is your AI's memory. Tap any light to read it.</p>`);
+  el.classList.add('on');
+}
+$('wgot').onclick = async () => { await post('/api/nav/dismiss-welcome'); NAV && (NAV.welcomeDismissed = true); $('welcome').classList.remove('on'); };
+
+// ---------- phones ----------
+document.querySelectorAll('#mob [data-t]').forEach(b => b.onclick = () => { const t = b.dataset.t, other = t === 'nav' ? 'side' : 'nav'; $(other).classList.remove('open'); $(t).classList.toggle('open'); });
+
+// ---------- greeting ----------
+function tick() {
+  const d = new Date(), h = d.getHours();
+  const who = S?.person ? ', ' + S.person : '';
+  $('greet').textContent = (h < 5 ? 'Late night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + who;
+  $('clock').textContent = d.toLocaleString([], { weekday: 'long', hour: 'numeric', minute: '2-digit' });
+}
+setInterval(tick, 20000);
+
+// ---------- keeping it live ----------
+let first = true;
+async function refresh() {
+  let d; try { d = await j('/api/web'); } catch { return; }
+  const sig = JSON.stringify([d.center?.path, d.boot.map(b => b.path), d.rooms.map(r => [r.id, r.title, r.blocks.map(b => [b.path, b.support.length])]), d.threads.length, d.edges, d.ai]);
+  const rebuild = sig !== refresh.sig; refresh.sig = sig;
+  S = d;
+  AI = d.ai.color || '#f2a84b'; AI2 = mix(AI);
+  document.documentElement.style.setProperty('--ai', AI); document.documentElement.style.setProperty('--ai2', AI2);
+  if (rebuild) {
+    const w = makeWorld(d); nodes = w.N; links = w.L; byPath = w.P; center = w.c; edges = w.E;
+    if (focus) focus = nodes.find(n => n.id === focus.id) || null;
+    if (first || !focus) goHome();
+    for (const e of edges) if (e.pic && !pics[e.pic]) loadImg(e.pic).then(i => { pics[e.pic] = i; });
+  } else {
+    // keep node objects; just freshen the times
+    const t = {}; for (const b of [d.center, ...d.boot, ...d.rooms.flatMap(r => [...r.blocks, ...r.blocks.flatMap(b => b.support)])]) if (b) t[b.path] = b.mtime;
+    for (const n of nodes) if (n.path && t[n.path]) n.mtime = t[n.path];
+  }
+  // a save we saw land: send a pulse to it
+  const m = {}; for (const n of nodes) if (n.path && n.mtime) m[n.path] = n.mtime;
+  if (!first) for (const p in m) if (lastM[p] !== m[p]) { const n = byPath[p]; if (n) pulses.push({ n, t: 0 }); if (readerData?.path === p) openBlock(p, readerTab); }
+  lastM = m;
+  changed = new Set(d.changed.map(c => c.path));
+  flagged = new Set(d.flags.map(f => f.path));
+  if (first) { tick(); }
+  first = false;
+}
+function mix(hex) { const [r, g, b] = rgb(hex); const m = v => Math.round(v + (255 - v) * .42); return '#' + [m(r), m(g), m(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }
+async function refreshAll() {
+  await refresh();
+  try { const f = await j('/api/flags'); doneFlags = f.done || []; } catch {}
+  try { const r = await j('/api/recent'); saves = r.saves || []; } catch {}
+  renderSide(); renderSince();
+}
+
+(async () => {
+  pics.ai = await loadImg('/api/picture/ai');
+  try { NAV = await j('/api/nav'); } catch { NAV = { mine: null, suggested: { groups: [] } }; }
+  await refreshAll();
+  renderNav(); renderWelcome();
+  requestAnimationFrame(frame);
+  // ?open=money/budget.md opens a block on arrival, so an AI can point its person straight at one
+  const want = new URLSearchParams(location.search).get('open');
+  if (want) {
+    $('reader').style.transition = 'none';
+    const n = byPath[want]; n ? openNode(n) : openBlock(want);
+    Object.assign(cam, camT);
+    setTimeout(() => { $('reader').style.transition = ''; }, 600);
+  }
+  else if (saves[0]) setTimeout(() => replay(saves[0].paths), 900);
+  setInterval(async () => {
+    const before = refresh.sig;
+    await refreshAll();
+    if (refresh.sig !== before && !$('q').value) renderNav();
+  }, 4000);
+  // a new picture or name for the AI shows up on its own
+  setInterval(async () => { const i = await loadImg('/api/picture/ai?' + Date.now()); if (i) pics.ai = i; }, 30000);
+})();
+})();
+</script>
+</body>
+</html>
