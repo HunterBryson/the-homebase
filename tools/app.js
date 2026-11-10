@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Homebase as its own app (the app/ folder): the AI's face on the taskbar, one click to open, starts with the computer.
-//   node tools/app.js setup        download the app shell once (about 100 MB, a minute)
+//   node tools/app.js setup        download the app shell once (about 100 MB, 280 MB unpacked)
 //   node tools/app.js install      Start menu + desktop shortcuts, start with the computer, then open it
 //   node tools/app.js install --no-startup   the same, without starting with the computer
 //   node tools/app.js              open it (or bring the open window forward)
@@ -21,7 +21,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
 if (cmd === 'setup') {
   if (electron() && fs.existsSync(electron())) { console.log('The app shell is already here.'); process.exit(0); }
-  console.log('Downloading the app shell (about 100 MB, a minute)...');
+  console.log('Downloading the app shell (about 100 MB, about 280 MB once unpacked; a minute or two). npm may print warnings about allow-scripts or deprecated packages; they\x27re harmless.');
   execSync('npm install --no-audit --no-fund', { cwd: APP, stdio: 'inherit' });
   // Newer npm can hold back Electron's own download step (allow-scripts); run it ourselves if the app is missing.
   if (!(electron() && fs.existsSync(electron())) && fs.existsSync(path.join(APP, 'node_modules', 'electron', 'install.js'))) execSync(`"${process.execPath}" install.js`, { cwd: path.join(APP, 'node_modules', 'electron'), stdio: 'inherit' });
@@ -49,5 +49,7 @@ if (cmd === 'install') {
   console.log(s && s.at !== before ? `Installed. Starts with the computer: ${s.startup ? 'yes' : 'no'}. Shortcuts:\n  ${(s.shortcuts || []).join('\n  ') || 'none on this OS'}\nThe window is opening. To pin it: right-click its face on the taskbar, then "Pin to taskbar".` : "Didn't hear back from the app; check node tools/app.js status.");
 } else if (cmd === 'uninstall') {
   for (let i = 0; i < 40 && state(); i++) await wait(250);
-  console.log(state() ? "Didn't hear back; check node tools/app.js status." : 'Shortcuts and the startup entry are gone. A taskbar pin, if they made one, is theirs to unpin.');
+  // The server goes too; node tools/open.js brings it back if they want Homebase in a browser window.
+  try { process.kill(+fs.readFileSync(path.join(ROOT, 'data', 'server.pid'), 'utf8')); } catch {}
+  console.log(state() ? "Didn't hear back; check node tools/app.js status." : 'Shortcuts, the startup entry and the running server are gone. A taskbar pin, if they made one, is theirs to unpin. To get the space back, delete the app/node_modules folder (about 280 MB).');
 } else console.log('Opening Homebase.');

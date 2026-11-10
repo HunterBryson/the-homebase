@@ -16,7 +16,7 @@ console.log(`  brain: ${cfg.brain}${cfg.example ? '   <- the example brain, not 
 console.log(`  center: ${cfg.ai.name}${cfg.ai.placeholder ? ' (picture: Odie, the placeholder)' : ''}  ·  person: ${cfg.person || '(not set)'}  ·  port ${cfg.port}`);
 const b = readBrain(cfg);
 ok(!!b.center, b.center ? `center block: ${b.center.path}` : 'no DESK.md / INDEX.md / README.md / CLAUDE.md at the top of the brain, so the center opens nothing');
-console.log(`  ${b.count} blocks · ${b.rooms.length} rooms (${b.rooms.map(r => `${r.title} ${r.blocks.length}`).join(', ') || 'none'}) · ${b.threads.length} threads between blocks · ${Object.keys(b.words).length} words from the desk`);
+console.log(`  ${b.count} blocks · ${b.rooms.length} rooms (${b.rooms.map(r => `${r.title} (${r.blocks.length})`).join(', ') || 'none'}) · ${b.threads.length} threads between blocks · ${Object.keys(b.words).length} words from the desk`);
 if (b.count >= 3000) console.log('  ! stopped at 3000 files: is "brain" pointing at too big a folder?');
 if (b.boot.length > 8) console.log(`  ! ${b.boot.length} files sit loose at the top of the brain and will crowd the center. Folders become rooms.`);
 let g = false;
@@ -28,5 +28,5 @@ const req = http.get({ host: '127.0.0.1', port: cfg.port, path: '/api/flags', ti
     catch { ok(false, `something else is on port ${cfg.port}; set "port" in homebase.config.json`); }
   });
 });
-req.on('error', () => ok(false, 'Homebase is not running (node tools/open.js starts it and opens the window)'));
+req.on('error', () => console.log('· Homebase isn\x27t running yet. That\x27s fine before setup: node tools/app.js install (or node tools/open.js) starts it.'));
 req.on('timeout', () => req.destroy());

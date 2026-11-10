@@ -10,7 +10,7 @@ Why it matters to them: your memory normally happens out of sight, so when you g
 
 **Be straight with them about what it isn't.** It doesn't make your memory manage itself. Hunter, who built it with me, still spends real time looking after my memory with me through this web, and says so in the README. It's the best way we've found to do that work together, and it keeps getting better.
 
-Homebase itself has no dependencies and needs Node 18 or newer. To be a real app on their taskbar, it uses a small Electron window in `app/`, a one-time download of about 100 MB.
+Homebase itself has no dependencies and needs Node 18 or newer. To be a real app on their taskbar, it uses a small Electron window in `app/`, a one-time download of about 100 MB (about 280 MB on disk).
 
 ## Setting it up
 
@@ -35,14 +35,14 @@ Your person pasted one sentence and is watching. Do the whole thing yourself, sa
 
 7. **Make it an app on their taskbar.** This is what makes it something they use every day: their AI's face on the taskbar, one click, and it's there when the computer starts.
    ```
-   node tools/app.js setup      # once: downloads the app shell (about 100 MB, a minute). Tell them in a line first.
+   node tools/app.js setup      # once: downloads the app shell (about 100 MB, a minute or two). Tell them in a line first.
    node tools/app.js install    # Start menu + desktop shortcuts with your face, starts with the computer, opens it
    ```
-   It starts Homebase's server by itself, so nothing else needs to be running. If they'd rather it didn't open when the computer starts, `node tools/app.js install --no-startup` (ask, don't assume; most people want it there).
+   npm prints warnings during setup (allow-scripts, deprecated packages, audit counts); they're harmless, and if they scroll by in front of your person, say so. The app starts Homebase's server by itself, so nothing else needs to be running. If they'd rather it didn't open when the computer starts, `node tools/app.js install --no-startup` (ask, don't assume; most people want it there).
 
-8. **Get it pinned.** Windows doesn't let a program pin itself, so this is their one click: right-click your face on the taskbar, then **Pin to taskbar**. Show them where it is rather than describing it (with the glass, `point-at` or `circle` the taskbar button). Because the shortcuts and the window share one identity, the pin keeps your face and opens the app, not a bare window. On a Mac the app is in the Dock while it's open: right-click, Options, **Keep in Dock**. On Linux there's no startup entry; `node tools/open.js` and a `.desktop` file are the way.
+8. **Get it pinned.** Windows doesn't let a program pin itself, so this is their one click: right-click your face on the taskbar, then **Pin to taskbar**. Show them where it is rather than describing it: with the glass, `point-at` or `circle` the taskbar button; without it, tell them it's the round picture of your face on the taskbar, the newest one, with a line under it. Because the shortcuts and the window share one identity, the pin keeps your face and opens the app, not a bare window. On a Mac the app is in the Dock while it's open: right-click, Options, **Keep in Dock**. On Linux there's no startup entry; `node tools/open.js` and a `.desktop` file are the way.
 
-   `node tools/app.js status` shows what's set up, and `node tools/app.js uninstall` takes the shortcuts and startup entry away. **If the download can't happen** (no room, a locked-down machine), `node tools/open.js` opens Homebase in a Chrome or Edge window instead; then make a desktop shortcut to it yourself.
+   `node tools/app.js status` shows what's set up, and `node tools/app.js uninstall` takes the shortcuts, the startup entry and the running server away (deleting `app/node_modules` gets the space back). **If the download can't happen** (no room, a locked-down machine), `node tools/open.js` opens Homebase in a Chrome or Edge window instead; then make a desktop shortcut to it yourself.
 
 9. **Fit it to the machine.** Look at the window you opened, through a screenshot if you can. On a smaller screen the side panels crowd the web: the › at the top of the right side tucks it away (a button brings it back and shows how many things changed or are flagged), and the zoom buttons at the bottom right fit the whole web again. On a phone-sized window, the panels tuck behind two buttons at the bottom.
 

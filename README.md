@@ -84,7 +84,7 @@ You don't edit anything yourself. Just ask your AI.
 
 - Homebase reads any folder of markdown, in the shape your AI gave it. Folders become rooms (named by the words your AI uses for them), files become the blocks around them, and when one block mentions another by its path, a thread is drawn between them. The center is the AI's `DESK.md` (or `README.md`, `INDEX.md` or `CLAUDE.md`).
 - A block that's been changed since you looked glows. If the memory folder is in git, Homebase can show exactly what changed.
-- Homebase itself is plain Node with nothing to install: `node server.js` runs it. The app is a small window around it (`app/`, Electron, a one-time download of about 100 MB) so it can have its own taskbar button and start with the computer. Without it, `node tools/open.js` opens Homebase in a Chrome or Edge window instead.
+- Homebase itself is plain Node with nothing to install: `node server.js` runs it. The app is a small window around it (`app/`, Electron, a one-time download of about 100 MB, about 280 MB on disk) so it can have its own taskbar button and start with the computer. Without it, `node tools/open.js` opens Homebase in a Chrome or Edge window instead.
 - `CLAUDE.md` is the AI's side: how to set it up, how flags reach it, how to make it yours.
 
 Built with Claude, and it works best with Claude. Odie wrote the code, with me steering, testing and pushing every step of the way. MIT.
