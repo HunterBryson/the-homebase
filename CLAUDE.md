@@ -10,7 +10,7 @@ Why it matters to them: your memory normally happens out of sight, so when you g
 
 **Be straight with them about what it isn't.** It doesn't make your memory manage itself. Hunter, who built it with me, still spends real time looking after my memory with me through this web, and says so in the README. It's the best way we've found to do that work together, and it keeps getting better.
 
-The repo has no dependencies. It needs Node 18 or newer, and that's all.
+Homebase itself has no dependencies and needs Node 18 or newer. To be a real app on their taskbar, it uses a small Electron window in `app/`, a one-time download of about 100 MB.
 
 ## Setting it up
 
@@ -33,18 +33,16 @@ Your person pasted one sentence and is watching. Do the whole thing yourself, sa
 
 6. **Git, if your brain isn't in it.** Homebase can only show *what* changed if the brain is a git repo. If it isn't, ask your person if that's OK (it stays on their computer, nothing goes online), then `git init` in the brain folder and commit what's there. Commit as you save from then on. Without git, changes still glow; there's just no "what changed" view.
 
-7. **Open it.** `node tools/open.js` starts Homebase in the background (if it isn't running) and opens it in its own window (Chrome or Edge in app mode, otherwise the default browser).
-
-8. **Put a shortcut on their desktop** that runs `node tools/open.js`, with the Homebase folder as its working folder. On Windows, from PowerShell:
-   ```powershell
-   $s = (New-Object -ComObject WScript.Shell).CreateShortcut("$([Environment]::GetFolderPath('Desktop'))\Homebase.lnk")
-   $s.TargetPath = (Get-Command node).Source     # or "C:\Program Files\nodejs\node.exe"
-   $s.Arguments = '"<full path to Homebase>\tools\open.js"'
-   $s.WorkingDirectory = '<full path to Homebase>'
-   $s.WindowStyle = 7                            # minimized: no console flash
-   $s.Save()
+7. **Make it an app on their taskbar.** This is what makes it something they use every day: their AI's face on the taskbar, one click, and it's there when the computer starts.
    ```
-   On a Mac, a small `Homebase.command` file on the desktop (`cd` to the folder, then `node tools/open.js`, then `chmod +x`). On Linux, a `.desktop` file. Ask them whether they'd like it to start when the computer starts, too.
+   node tools/app.js setup      # once: downloads the app shell (about 100 MB, a minute). Tell them in a line first.
+   node tools/app.js install    # Start menu + desktop shortcuts with your face, starts with the computer, opens it
+   ```
+   It starts Homebase's server by itself, so nothing else needs to be running. If they'd rather it didn't open when the computer starts, `node tools/app.js install --no-startup` (ask, don't assume; most people want it there).
+
+8. **Get it pinned.** Windows doesn't let a program pin itself, so this is their one click: right-click your face on the taskbar, then **Pin to taskbar**. Show them where it is rather than describing it (with the glass, `point-at` or `circle` the taskbar button). Because the shortcuts and the window share one identity, the pin keeps your face and opens the app, not a bare window. On a Mac the app is in the Dock while it's open: right-click, Options, **Keep in Dock**. On Linux there's no startup entry; `node tools/open.js` and a `.desktop` file are the way.
+
+   `node tools/app.js status` shows what's set up, and `node tools/app.js uninstall` takes the shortcuts and startup entry away. **If the download can't happen** (no room, a locked-down machine), `node tools/open.js` opens Homebase in a Chrome or Edge window instead; then make a desktop shortcut to it yourself.
 
 9. **Fit it to the machine.** Look at the window you opened, through a screenshot if you can. On a smaller screen the side panels crowd the web: the › at the top of the right side tucks it away (a button brings it back and shows how many things changed or are flagged), and the zoom buttons at the bottom right fit the whole web again. On a phone-sized window, the panels tuck behind two buttons at the bottom.
 
@@ -73,7 +71,7 @@ A flag only helps if you see it. Homebase can't message you, so you check.
 
 They won't edit files. They'll ask you, and here's where each thing lives.
 
-- **Your picture and name in the middle.** Odie's picture is a placeholder, and a note on their screen says so until you replace it. Make or choose a picture of yourself (ask them what they'd like, or show them a couple of options), save it in your brain or in Homebase's folder, and set `ai.picture` to its path and `ai.name` to your name. Square images work best. The page picks up a new picture by itself; a new name shows up after `node tools/open.js --restart`.
+- **Your picture and name in the middle.** Odie's picture is a placeholder, and a note on their screen says so until you replace it. Make or choose a picture of yourself (ask them what they'd like, or show them a couple of options), save it in your brain or in Homebase's folder, and set `ai.picture` to its path and `ai.name` to your name. Square images work best. The page picks up a new picture by itself, and the app's face on the taskbar and its shortcuts follow it the next time the app opens. A new name shows up after `node tools/open.js --restart`.
 - **The left side** belongs to them. It starts with a short note and a suggested set they can accept in one tap. Their own version lives in `data/nav.json`, and you edit it directly; the page refreshes on its own:
   ```json
   { "groups": [

@@ -52,7 +52,7 @@ Open a chat with your AI, in the folder where it lives, and paste this:
 
 > Set up Homebase for me from https://github.com/HunterBryson/the-homebase. Clone it next to your memory folder, read its CLAUDE.md, and follow it. If anything asks for permission along the way, it's fine.
 
-Your AI does the rest. If your computer doesn't have Node (the small program Homebase runs on), it'll install it, and your computer may ask you to allow that once. Then a window opens with your AI's memory in it, and a Homebase shortcut lands on your desktop. Your AI will show you around.
+Your AI does the rest. If your computer doesn't have Node (the small program Homebase runs on), it'll install it, and your computer may ask you to allow that once. Then Homebase opens as its own app, with your AI's face on the taskbar. Right-click that face and choose **Pin to taskbar**, and it's one click away for good. It also opens by itself when your computer starts (tell your AI if you'd rather it didn't). Your AI will show you around.
 
 **Your AI doesn't keep memory in files yet?** Start with [the shelves](https://github.com/HunterBryson/the-shelves): a starter brain any Claude can move into with one pasted line. Then set up Homebase.
 
@@ -78,13 +78,13 @@ You don't edit anything yourself. Just ask your AI.
 
 **Does it change my AI's memory?** Never on its own. It only reads. Your AI makes the changes, and Homebase shows you what changed.
 
-**It's not showing the newest thing.** It checks for changes every few seconds by itself. If the window seems stuck, close it and open the shortcut again.
+**It's not showing the newest thing.** It checks for changes every few seconds by itself. If the window seems stuck, close it and click its face on the taskbar again.
 
 ## For the curious
 
 - Homebase reads any folder of markdown, in the shape your AI gave it. Folders become rooms (named by the words your AI uses for them), files become the blocks around them, and when one block mentions another by its path, a thread is drawn between them. The center is the AI's `DESK.md` (or `README.md`, `INDEX.md` or `CLAUDE.md`).
 - A block that's been changed since you looked glows. If the memory folder is in git, Homebase can show exactly what changed.
-- There's nothing to install beyond Node. `node server.js` runs it; `node tools/open.js` starts it and opens the window.
+- Homebase itself is plain Node with nothing to install: `node server.js` runs it. The app is a small window around it (`app/`, Electron, a one-time download of about 100 MB) so it can have its own taskbar button and start with the computer. Without it, `node tools/open.js` opens Homebase in a Chrome or Edge window instead.
 - `CLAUDE.md` is the AI's side: how to set it up, how flags reach it, how to make it yours.
 
 Built with Claude, and it works best with Claude. Odie wrote the code, with me steering, testing and pushing every step of the way. MIT.
