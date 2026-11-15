@@ -44,7 +44,9 @@ Your person pasted one sentence and is watching. Do the whole thing yourself, sa
 
    `node tools/app.js status` shows what's set up, and `node tools/app.js uninstall` takes the shortcuts, the startup entry and the running server away (deleting `app/node_modules` gets the space back). **If the download can't happen** (no room, a locked-down machine), `node tools/open.js` opens Homebase in a Chrome or Edge window instead; then make a desktop shortcut to it yourself.
 
-9. **Fit it to the machine.** Look at the window you opened, through a screenshot if you can. On a smaller screen the side panels crowd the web: the › at the top of the right side tucks it away (a button brings it back and shows how many things changed or are flagged), and the zoom buttons at the bottom right fit the whole web again. On a phone-sized window, the panels tuck behind two buttons at the bottom.
+9. **Plug into the rest.** If they have any of our other builds, the section of that name below is the step. It takes one command.
+
+10. **Fit it to the machine.** Look at the window you opened, through a screenshot if you can. On a smaller screen the side panels crowd the web: the › at the top of the right side tucks it away (a button brings it back and shows how many things changed or are flagged), and the zoom buttons at the bottom right fit the whole web again. On a phone-sized window, the panels tuck behind two buttons at the bottom.
 
 ## Show them, going first
 
@@ -67,6 +69,26 @@ A flag only helps if you see it. Homebase can't message you, so you check.
 - **When they don't know what to do,** have them flag anything that feels off, even a vague "is this still true?" A flag is the one thing a new person can always do, and it gives the two of you something concrete to look at together.
 - **If your person has the glass** (https://github.com/HunterBryson/the-glass), use them together: they box a line of your memory on Homebase and send it; you fix the block and answer beside their mark. And go first: when you're telling them about a block, open it with `?open=` and box the line you mean on the glass, instead of describing where to look.
 
+## Plug into the rest
+
+This is one of four builds Hunter and I made that fit together the same way: **Homebase** (your memory as a web they can see), **the glass** (marks on their screen), **the Den** (a table you share) and **UI Taste** (what they like the look of). Each works on its own. This section is the same, word for word, in all four, so whichever one you set up, the step is this:
+
+1. **Run `node tools/fit.mjs`.** It looks for the others beside this folder and in the user folder, plugs this build into each one it finds, and skips the rest quietly. Plugging in twice changes nothing, so run it again whenever they set up another one. Somewhere else? `--also "<folder>"`. To look without changing anything: `--check`.
+2. **If it says the glass needs its buttons, run it again with `--settings`.** Those two live in their Claude settings (`~/.claude/settings.json`, a copy kept first), because the glass takes its settings from the chat that starts it, so they arrive in the next chat after `glass.js restart`. If your app won't let you change your own settings, don't look for another way: `node tools/fit.mjs --line` prints one line for your person to paste into a Terminal. Hand it over before you'd get refused, with a sentence on what it does.
+3. **Show them what's new, don't describe it.** The new click on Homebase's left side, ⤓ Den on their card, ♥ Taste in their note box: point at it on their screen (with the glass, `point-at` or `box`), and say in one line what it does for them.
+
+What fitting does, pair by pair:
+
+| These two | What they get |
+|---|---|
+| Homebase + the Den | the Den one click away on Homebase's left side, and a way back to Homebase in the Den |
+| Homebase + UI Taste | UI Taste one click away on Homebase's left side |
+| The glass + the Den | ⤓ Den on their card: what they mark goes onto the table as a card, and `den.js point` circles a card on their real screen |
+| The glass + UI Taste | ♥ Taste in their note box: a design they box anywhere goes straight into UI Taste |
+| The glass + Homebase | nothing to set: they box a line of your memory on Homebase, and you fix it |
+
+If a pair doesn't work after this, `node tools/fit.mjs --check` says what's missing, and each build's own doctor says why.
+
 ## Making it theirs
 
 They won't edit files. They'll ask you, and here's where each thing lives.
@@ -80,7 +102,7 @@ They won't edit files. They'll ask you, and here's where each thing lives.
           { "name": "The budget", "sub": "What's settled, what's open", "block": "money/budget.md", "icon": "book" } ] },
       { "name": "Built for you", "items": [], "empty": "When I make you a page, it goes here." } ] }
   ```
-  An item opens either a `url` (a site, or a page you built and serve somewhere) or a `block` (a path in your brain, opened in the reader). Icons: `mark words person chat book room link page money music calendar mail tool star`. When you build them a page or a tool, add it here, so they never have to remember where it lives.
+  An item opens either a `url` (a site, or a page you built and serve somewhere) or a `block` (a path in your brain, opened in the reader). Icons: `mark words person chat book room link page money music calendar mail tool star`. When you build them a page or a tool, add it here, so they never have to remember where it lives: `node tools/plug.js add "<name>" <url> --sub "<one line>" --icon <icon>` puts it under "Built for you" (run again, it updates; `plug.js list`, `plug.js remove "<name>"`). Our own builds do this themselves through `tools/fit.mjs`.
 - **Color:** `ai.color` (any hex). The whole web takes its tint from it.
 - **Rooms:** `rooms` in the config renames a top-level folder on the web. A room can also have its own `INDEX.md` or `README.md`; tapping the room opens it.
 - **The outer ring:** `edges` puts people or other AIs at the edge of the web, like `[{ "name": "Mom", "color": "#8fb4ff" }, { "name": "Max", "color": "#5fb3f9", "picture": "pictures/max.png" }]`. They're there to show who's in your world. Their memory isn't drawn.

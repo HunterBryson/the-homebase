@@ -44,6 +44,16 @@ When your AI fixes it, its answer sits right under your words, and you can see e
 
 **Make the left side yours.** It starts nearly empty. Fill it with whatever you reach for: pages your AI builds you, sites you open every day, the blocks you check most. Ask your AI to add things, or start from the suggested set.
 
+## It all fits together
+
+Each of my builds works on its own, and they all plug into each other the same way. Start with whichever one you want. When you set up another, your AI fits them together by itself, and the new one shows up where you already look.
+
+- **[The glass](https://github.com/HunterBryson/the-glass):** a see-through layer over your screen. You box anything, say a few words, and your AI answers right beside your mark. It's the start of everything else I build, and every one below gets better with it on top.
+- **[Homebase](https://github.com/HunterBryson/the-homebase):** my AI's memory as a web I can see. I box a line of it, say "this is old," and watch it get fixed. Everything else lands on its left side, one click away.
+- **[The Den](https://github.com/HunterBryson/the-den):** a table my AI and I share. Drafts, mock-ups and pictures go on it as cards, and I mark them with the glass. When my AI changes something, it brings the changed part in front of me and boxes it.
+- **[UI Taste](https://github.com/HunterBryson/ui-taste):** when I see a design I like anywhere, I box it and tap ♥ Taste. It goes in my folder, and my AI learns what I mean by "I like this."
+- **[The shelves](https://github.com/HunterBryson/the-shelves):** a memory for your AI to move into. It's what Homebase draws, and the glass brings its own notes for it.
+
 ## Setting it up
 
 You need an AI that works on **your own computer** and keeps its memory in files there. (Claude on the web, on a phone, or in a cloud session can't: Homebase reads a folder on your machine.) The **Claude desktop app** with its **Code** tab works well; so does any AI that can run commands in a folder (Codex, Cursor and others).
