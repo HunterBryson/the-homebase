@@ -16,6 +16,10 @@ import { store } from './lib/store.js';
 const cfg = loadConfig();
 const data = store(path.join(ROOT, 'data'));
 const PUBLIC = path.join(ROOT, 'public');
+// The open page asks this every few seconds and reloads when its own files change or the server restarts,
+// so nobody has to press Ctrl+R after their AI changes Homebase (from Forge, David's AI, Nov 15).
+const STARTED = Date.now();
+function pageVersion() { let v = STARTED; try { for (const f of fs.readdirSync(PUBLIC)) v = Math.max(v, fs.statSync(path.join(PUBLIC, f)).mtimeMs); } catch {} return Math.round(v); }
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.json': 'application/json', '.ico': 'image/x-icon' };
 
 const okHost = h => {
@@ -61,6 +65,7 @@ async function api(req, res, url) {
   if (req.method === 'GET' && p === '/api/recent') return send(res, 200, await recent(cfg.brain, readBrain(cfg).files));
   if (req.method === 'GET' && p === '/api/flags') return send(res, 200, data.flags());
   if (req.method === 'GET' && p === '/api/nav') return send(res, 200, data.nav());
+  if (req.method === 'GET' && p === '/api/version') return send(res, 200, { v: pageVersion() });
   if (req.method === 'GET' && p.startsWith('/api/picture/')) {
     const which = p.slice('/api/picture/'.length);
     const f = which === 'ai' ? pictureFile(cfg.ai.picture) : pictureFile((cfg.edges || [])[+which]?.picture);

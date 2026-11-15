@@ -788,6 +788,11 @@ async function refreshAll() {
   }, 4000);
   // a new picture or name for the AI shows up on its own
   setInterval(async () => { const i = await loadImg('/api/picture/ai?' + Date.now()); if (i) pics.ai = i; }, 30000);
+  // The left side follows data/nav.json, and the page reloads itself when its own code changes,
+  // unless someone is typing (from Forge, David's AI, Nov 15: "the goal would be that it updates as we change things")
+  setInterval(async () => { try { const n = await j('/api/nav'); if (JSON.stringify(n) !== JSON.stringify(NAV)) { NAV = n; if (!$('q').value) renderNav(); } } catch {} }, 15000);
+  let pageV = null;
+  setInterval(async () => { try { const { v } = await j('/api/version'); if (pageV && v !== pageV && !document.querySelector('textarea:focus,input:focus')) location.reload(); pageV = v; } catch {} }, 5000);
 })();
 })();
 </script>
