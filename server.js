@@ -17,7 +17,7 @@ const cfg = loadConfig();
 const data = store(path.join(ROOT, 'data'));
 const PUBLIC = path.join(ROOT, 'public');
 // The open page asks this every few seconds and reloads when its own files change or the server restarts,
-// so nobody has to press Ctrl+R after their AI changes Homebase (from Forge, David's AI, Nov 15).
+// so nobody has to press Ctrl+R after their AI changes Homebase.
 const STARTED = Date.now();
 function pageVersion() { let v = STARTED; try { for (const f of fs.readdirSync(PUBLIC)) v = Math.max(v, fs.statSync(path.join(PUBLIC, f)).mtimeMs); } catch {} return Math.round(v); }
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.json': 'application/json', '.ico': 'image/x-icon' };

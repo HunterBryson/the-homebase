@@ -1,10 +1,10 @@
 # Homebase
 
-**See your AI's memory, fix what's wrong with one tap, and watch what it learns.**
+**Start with one real ask. Watch it become something special to you.** See your AI's memory as a living web, fix anything that's off with one tap, and watch what it learns across **Claude or Antigravity**.
 
 ![Homebase: an AI's memory drawn as a living web, with the AI's picture in the middle](docs/web.png)
 
-If your AI keeps a memory in files, Homebase draws it as a living web on your own computer. The AI sits in the middle. Each light is one thing it remembers: your budget, your garden, the people in your life. Tap a light to read exactly what it knows. When something's wrong, flag it, and your AI fixes it next time you talk. When your AI learns something new, that light glows until you've looked.
+If your AI keeps a memory in files, Homebase draws it as a living web on your own computer. Your AI sits in the middle. Each light is one thing it remembers: your Work schedule, your Personal reminders, what it learned after you connected your texts, and the people in your life. Tap a light to read exactly what it knows. When something's wrong, flag it in one tap, and your AI fixes it in place. When your AI saves something new—even during sleep housekeeping after you close chat—that light glows until you've looked.
 
 ## Why I made it
 
@@ -26,37 +26,38 @@ I haven't been able to make a memory framework that manages itself. Even in my o
 
 **Read it.** Tap any light, and the block opens on the right: what your AI knows, in its own words. If you say a block's word to your AI (like "budget"), that's the block it reads.
 
-**Flag what's wrong.** Tap ⚑ on any block. If only one part is wrong, select that part first. Add a few words if you want ("the garlic is already dug up"). Your AI sees your flags when it starts, fixes the block, and its answer shows up right under your flag.
+**Flag what's wrong.** Tap ⚑ on any block. If only one part is wrong, select that line first and add a quick note ("Friday mornings are deep work now, move calls to 1 PM"). Your AI sees your flags on open, updates its memory in place, and writes its reply right under your flag.
 
-![A flag on the garden block: the part Sam selected, and Sam's words, waiting for the AI](docs/flag.png)
+![A flag on the personal schedule block: the part selected and a quick note waiting on the AI](docs/flag.png)
 
-When your AI fixes it, its answer sits right under your words, and you can see exactly what it changed in the block:
+When your AI fixes it, its answer sits right under your words, and you can inspect the exact word-by-word diff:
 
-![The flag on Jules, fixed: Sam's words, the AI's answer, and the change it made](docs/fixed.png)
+![The flag fixed: your note, the AI's reply, and the exact change it saved](docs/fixed.png)
 
-**Not sure what to do?** Flag anything at all, even "this doesn't sound like me" or "is this still true?" Your AI looks at the block with you and works it out. Flags are the easiest way into your AI's memory: you don't have to know how it works to point at something.
+**Not sure what to do?** Flag anything at all, even "this doesn't sound right" or "is this still true?" Your AI looks at the block with you and fixes it in one conversation. Flags are the easiest way into your AI's memory: you don't have to know how it works to point at something.
 
-**See what changed.** Whenever your AI saves something to its memory, that light glows on the web and shows up under "Changed since you looked." Open it to see what changed. If your AI's memory is kept in git (the shelves are), you'll see it word by word: new words in green, removed words crossed out. The glow fades once you've looked.
+**See what changed.** Whenever your AI updates a schedule, picks up a new reminder from an email or text, or runs sleep housekeeping, that light glows on the web and shows up under "Changed since you looked." Open it to see the exact diff: new words in green, removed words crossed out. The glow fades once you've looked.
 
 ![What the AI changed, as plain words: green is new, red is gone](docs/what-changed.png)
 
-**Even better with [the glass](https://github.com/HunterBryson/the-glass).** The glass is a see-through layer over your screen, where you circle or box anything and send it to your AI with a few words, and it answers right beside your mark. Put Homebase on one side and the glass over it, and you can box a line of your AI's memory and say "this is old," and it fixes the line while you watch. Your AI can draw on the glass too, so it can point at the part of its memory it means instead of describing it. It's how Odie and I look after his memory every day, and it's the easiest start for someone new: you don't need to know what to ask, you just point.
+**Even better with [the glass](https://github.com/HunterBryson/the-glass).** The glass is a see-through layer over your screen, where you circle or box anything and send it to your AI with a few words, and it answers right beside your mark. Put Homebase on one side and the glass over it, and you can box a line of your AI's memory and say "this is old," and it fixes the line while you watch. Your AI can draw on the glass too, so it can point at the part of its memory it means instead of describing it.
 
-**Make the left side yours.** It starts nearly empty. Fill it with whatever you reach for: pages your AI builds you, sites you open every day, the blocks you check most. Ask your AI to add things, or start from the suggested set.
+**The left rail works out of the box.** Jump straight to your Work schedule, Personal reminders, Inbox & messages, or any plugged-in tool like The Den—and ask your AI to add whatever else you reach for every day.
 
+<!-- FOUNDRY:FIT:START -->
 ## It all fits together
 
-Each of my builds works on its own, and they all plug into each other the same way. Start with whichever one you want. When you set up another, your AI fits them together by itself, and the new one shows up where you already look.
+Each build works on its own on **Claude or Antigravity**, and they all plug into each other the same way. Start with whichever one you want. When you set up another, your AI fits them together with `node tools/fit.mjs`, and the new one shows up where you already look.
 
-- **[The glass](https://github.com/HunterBryson/the-glass):** a see-through layer over your screen. You box anything, say a few words, and your AI answers right beside your mark. It's the start of everything else I build, and every one below gets better with it on top.
-- **[Homebase](https://github.com/HunterBryson/the-homebase):** my AI's memory as a web I can see. I box a line of it, say "this is old," and watch it get fixed. Everything else lands on its left side, one click away.
-- **[The Den](https://github.com/HunterBryson/the-den):** a table my AI and I share. Drafts, mock-ups and pictures go on it as cards, and I mark them with the glass. When my AI changes something, it brings the changed part in front of me and boxes it.
-- **[UI Taste](https://github.com/HunterBryson/ui-taste):** when I see a design I like anywhere, I box it and tap ♥ Taste. It goes in my folder, and my AI learns what I mean by "I like this."
-- **[The shelves](https://github.com/HunterBryson/the-shelves):** a memory for your AI to move into. It's what Homebase draws, and the glass brings its own notes for it.
+- **[The shelves](https://github.com/HunterBryson/the-shelves):** a starter memory folder for your AI to move into—what Homebase draws, and what the glass opens when you point at a line.
+- **[The glass](https://github.com/HunterBryson/the-glass):** a see-through layer over your screen. Box anything, say what you want, and your AI answers right beside your mark.
+- **[Homebase](https://github.com/HunterBryson/the-homebase):** your AI's memory as a living web you can read, diff, and flag with one tap. Everything else lands on its left rail, one click away.
+- **[The Den](https://github.com/HunterBryson/the-den):** a workspace table you and your AI share side by side—schedule mocks, live previews, and notes before anything is built.
+<!-- FOUNDRY:FIT:END -->
 
 ## Setting it up
 
-You need an AI that works on **your own computer** and keeps its memory in files there. (Claude on the web, on a phone, or in a cloud session can't: Homebase reads a folder on your machine.) The **Claude desktop app** with its **Code** tab works well; so does any AI that can run commands in a folder (Codex, Cursor and others).
+You need an AI that works on **your own computer** and keeps its memory in files there. **Claude** (Desktop Code tab or CLI) and **Antigravity** both work out of the box—or any AI that can run local commands in a folder. (Hosted web-only chats can't read a folder on your machine.)
 
 Open a chat with your AI, in the folder where it lives, and paste this:
 
@@ -64,7 +65,7 @@ Open a chat with your AI, in the folder where it lives, and paste this:
 
 Your AI does the rest. If your computer doesn't have Node (the small program Homebase runs on), it'll install it, and your computer may ask you to allow that once. Then Homebase opens as its own app, with your AI's face on the taskbar. Right-click that face and choose **Pin to taskbar**, and it's one click away for good. It also opens by itself when your computer starts (tell your AI if you'd rather it didn't). Your AI will show you around.
 
-**Your AI doesn't keep memory in files yet?** Start with [the shelves](https://github.com/HunterBryson/the-shelves): a starter brain any Claude can move into with one pasted line. Then set up Homebase.
+**Your AI doesn't keep memory in files yet?** Start with [the shelves](https://github.com/HunterBryson/the-shelves): a starter brain for **Claude or Antigravity** from one pasted line. Then set up Homebase.
 
 ## Making it yours
 
@@ -97,4 +98,4 @@ You don't edit anything yourself. Just ask your AI.
 - Homebase itself is plain Node with nothing to install: `node server.js` runs it. The app is a small window around it (`app/`, Electron, a one-time download of about 100 MB, about 280 MB on disk) so it can have its own taskbar button and start with the computer. Without it, `node tools/open.js` opens Homebase in a Chrome or Edge window instead.
 - `CLAUDE.md` is the AI's side: how to set it up, how flags reach it, how to make it yours.
 
-Built with Claude, and it works best with Claude. Odie wrote the code, with me steering, testing and pushing every step of the way. MIT.
+Works with **Claude and Antigravity**. Built by Hunter Bryson and Odie, MIT licensed.
