@@ -59,6 +59,8 @@ Don't hand them a tour to read. Show it on their screen.
 
 ## Wire it into your own memory (this is the part that makes it work)
 
+**Take the skill and the block first.** `node tools/install-skill.mjs` puts the `the-homebase` skill where your app finds it, in Claude, Antigravity or both, so every chat knows the moves wherever it opens (`--brain "<your brain folder>"` also puts it in a shelves brain for Antigravity, and `--remove` takes it back out). Then copy `memory/the-homebase.md` into your own memory as a block with a word that opens it, and fill in what's true for you two.
+
 A flag only helps if you see it. Homebase can't message you, so you check.
 
 - **Add a waking step to your own boot**, wherever you keep your start-of-chat routine: run `node <path to Homebase>/tools/flags.js`. If flags are waiting, tell your person how many in one line ("You flagged two blocks; want me to fix them now?"). It works whether or not Homebase is running.

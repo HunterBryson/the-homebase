@@ -1,0 +1,11 @@
+{
+  "name": "the-homebase",
+  "allow": [
+    "Bash(\"${NODE}\" \"${HOMEBASE}\":*)",
+    "Bash(\"${NODE}\" \"${TOOLS}/check.js\":*)",
+    "Bash(\"${NODE}\" \"${TOOLS}/open.js\":*)"
+  ],
+  "tokens": {
+    "PORT": "7940"
+  }
+}
