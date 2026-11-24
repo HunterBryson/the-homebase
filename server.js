@@ -24,7 +24,8 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
 
 const okHost = h => {
   const host = String(h || '').toLowerCase().replace(/:\d+$/, '');
-  return host === '127.0.0.1' || host === 'localhost' || host === '[::1]' || (cfg.allowHosts || []).includes(host);
+  const allowed = (cfg.allowHosts || []).map(x => String(x || '').toLowerCase().replace(/:\d+$/, ''));
+  return host === '127.0.0.1' || host === 'localhost' || host === '[::1]' || allowed.includes(host);
 };
 const send = (res, code, body, type = 'application/json') => {
   res.writeHead(code, { 'content-type': type, 'cache-control': 'no-store' });

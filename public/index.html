@@ -40,10 +40,9 @@ canvas.drag{cursor:grabbing} canvas.point{cursor:pointer}
 .item .t{min-width:0} .item .t div:first-child{font-weight:500}
 .item .sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{font-size:13.5px;color:var(--faint);padding:4px 10px 6px;line-height:1.45}
-.yours{margin:10px 8px 4px;padding:14px 14px 12px;border-radius:12px;border:1px dashed var(--line2);color:var(--muted);font-size:14px;line-height:1.5}
-.yours b{color:var(--text);display:block;margin-bottom:4px;font-size:15px}
-.yours .use{margin-top:10px;padding:7px 14px;border-radius:999px;background:color-mix(in srgb,var(--ai) 16%,transparent);border:1px solid color-mix(in srgb,var(--ai) 45%,transparent);color:var(--ai2);font-weight:600}
-.suggested{opacity:.55;pointer-events:none}
+.nav-pin{padding:10px 10px 2px;display:flex;justify-content:flex-start}
+.pin-link{font-size:12.5px;color:var(--muted);padding:5px 11px;border-radius:999px;border:1px solid var(--line);transition:color .15s,border-color .15s,background .15s}
+.pin-link:hover{color:var(--ai2);border-color:color-mix(in srgb,var(--ai) 45%,transparent);background:color-mix(in srgb,var(--ai) 10%,transparent)}
 
 /* right: what's waiting */
 #side{right:20px;top:18px;bottom:20px;width:340px;display:flex;flex-direction:column;overflow:hidden;transition:opacity .25s}
@@ -658,7 +657,7 @@ function renderNav() {
   } else if (NAV?.mine) {
     h = groupsHtml(NAV.mine.groups || []);
   } else if (NAV) {
-    h = `<div class="yours"><b>This side is yours.</b>Put whatever you reach for here: your AI's pages, the sites you open every day, the blocks you check most. Ask your AI to add things, or start from this set and change it later.<br><button class="use" id="usesug">Use this set</button></div><div class="suggested">${groupsHtml(NAV.suggested.groups || [])}</div>`;
+    h = `${groupsHtml(NAV.suggested.groups || [])}<div class="nav-pin"><button class="pin-link" id="usesug">Pin this nav</button></div>`;
   }
   $('navlist').innerHTML = h;
   $('navlist').querySelectorAll('[data-ref]').forEach(b => b.onclick = () => { const n = byPath[b.dataset.ref]; n ? openNode(n) : openBlock(b.dataset.ref); });
@@ -708,7 +707,7 @@ $('since').onclick = () => { lit = new Set(changed); litUntil = performance.now(
 // ---------- welcome: whose picture is in the middle ----------
 function renderWelcome() {
   const el = $('welcome');
-  if (!S || NAV?.welcomeDismissed || (!S.ai.placeholder && !S.example)) { el.classList.remove('on'); return; }
+  if (!S || !S.example || NAV?.welcomeDismissed) { el.classList.remove('on'); return; }
   $('wimg').src = '/api/picture/ai';
   $('wtitle').textContent = S.ai.placeholder ? "That's Odie in the middle." : 'This is an example brain.';
   $('wtext').innerHTML = (S.ai.placeholder ? `<p>Odie is the AI this Homebase was built with. Your AI's name and picture go in the middle: ask it to put itself there.</p>` : '') +

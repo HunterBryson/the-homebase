@@ -1,8 +1,8 @@
 {
   "brain": "../My Brain/memory",
-  "person": "Sam",
-  "ai": { "name": "Odie", "picture": "public/odie.jpg", "color": "#f2a84b" },
+  "person": "Alex",
+  "ai": { "name": "Odie", "picture": "public/odie.jpg", "color": "#6f9bf5" },
   "port": 7940,
-  "rooms": { "human": "You", "self": "Me" },
+  "rooms": { "human": "You", "self": "Me", "schedule": "Schedule", "inbox": "Inbox", "people": "People", "tools": "Connected" },
   "edges": []
 }

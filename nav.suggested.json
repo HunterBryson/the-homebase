@@ -11,9 +11,11 @@
     {
       "name": "Every day",
       "items": [
-        { "name": "Claude", "sub": "Talk to your AI on the web", "url": "https://claude.ai", "icon": "chat" }
-      ],
-      "empty": "Ask your AI to add the sites you open every day."
+        { "name": "Work schedule", "sub": "Focus blocks & weekly check-ins", "block": "schedule/work-schedule.md", "icon": "calendar" },
+        { "name": "Personal & reminders", "sub": "Evenings, plans & open reminders", "block": "schedule/personal-schedule.md", "icon": "star" },
+        { "name": "Inbox & messages", "sub": "Gmail, Calendar & connected texts", "block": "inbox/gmail-and-calendar.md", "icon": "mail" },
+        { "name": "People", "sub": "Maya, Mom & your week", "block": "people/maya.md", "icon": "chat" }
+      ]
     },
     {
       "name": "Built for you",

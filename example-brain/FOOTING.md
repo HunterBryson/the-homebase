@@ -1,11 +1,12 @@
 # Footing
 
-**Kind of chat:** a new day. We closed out last night after sorting the move dates.
+**Kind of chat:** Week 2 rhythm — inbox checked at open, sleep housekeeping at close.
 
-**Where we are:** the move is set for March 14 (`home/the-move.md`). The budget has a new line for it (`money/budget.md`).
+**Where we are:** Work and Personal schedules are cleanly separated (`schedule/work-schedule.md`, `schedule/personal-schedule.md`). Gmail, Calendar, and text messages all feed new dates and reminders automatically (`inbox/gmail-and-calendar.md`, `inbox/messages.md`).
 
-**Next move:** ask Sam how the interview went (`work/job-search.md`), then where their head is.
+**First move:** Flag the morning inbox sweep (`schedule/reminders.md`), mention Thursday dinner with Maya (`people/maya.md`), and ask where Alex's head is.
 
-**Open threads:**
-- The tomatoes need starting indoors by mid-February (`home/garden.md`).
-- Mom's birthday is the 3rd; Sam wanted an idea by this weekend (`people/mom.md`).
+**Open:**
+- Confirm Thursday 10:00 AM dentist visit before tomorrow's reminder clears (`schedule/reminders.md`).
+- Check Devon's updated draft notes from Docs before Friday's wrap-up (`people/work-team.md`).
+- Pick a Sunday gift stop before calling Mom (`people/mom.md`).
