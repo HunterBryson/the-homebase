@@ -117,4 +117,4 @@ Homebase checks for updates every few seconds automatically. If a window ever lo
 
 Open an issue and pick a form—your AI can even fill it in for you. Rather email? Write to hello@workbenchagents.com. Every issue and email reaches me, and I answer it myself, usually within a few days. Security problems go privately: see [SECURITY.md](https://github.com/HunterBryson/.github/blob/main/SECURITY.md).
 
-Works with **Claude and Antigravity**. Built by Hunter Bryson and Odie, MIT licensed.
+Works with **Claude and Antigravity**. MIT license.
