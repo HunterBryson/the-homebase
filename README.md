@@ -2,7 +2,7 @@
 
 **Turn the lights on inside your AI's memory.**
 
-A living map of everything your AI remembers—running privately on your own computer for **Claude or Antigravity**. Watch new memories light up as you talk, see exact word-by-word diffs, and fix anything that feels off with **one tap (`⚑`)**.
+A living map of everything your AI remembers—running privately on your own computer for **Claude**. Watch new memories light up as you talk, see exact word-by-word diffs, and fix anything that feels off with **one tap (`⚑`)**. *(Antigravity support is being tested next.)*
 
 ![Homebase: your AI's memory drawn as a living web with glowing recent changes and one-tap flags](docs/web.png)
 
@@ -11,16 +11,16 @@ Normally, an AI's memory is an invisible black box. You only see chat text—so 
 
 ---
 
-## Start in two minutes — your AI handles everything
+## Setting it up — your AI handles everything
 
 You don't dig through folders, wire up settings, or edit a single file by hand.
 
 - **Already using [The shelves](https://github.com/HunterBryson/the-shelves)?** Just tell your AI: **"Set up Homebase for us."**
-- **Starting standalone in Claude (Code tab) or Antigravity?** Open a chat in your AI's folder, paste this one sentence, and press Enter:
+- **Starting standalone in Claude (Code tab)?** Open a chat in your AI's folder, paste this one sentence, and press Enter:
 
 > Set up Homebase for me from https://github.com/HunterBryson/the-homebase. Clone it next to your memory folder, read its CLAUDE.md, and follow it. If anything asks for permission along the way, it's fine.
 
-**That's it.** Your AI clones it, installs what it needs, connects it to its memory, and opens Homebase as its own dark desktop app with your AI's face on your taskbar. Right-click that face and hit **Pin to taskbar** so it's one click away every day. *(Don't have a memory folder yet? Start with [The shelves](https://github.com/HunterBryson/the-shelves) first—takes five minutes—then say **"Set up Homebase for us."**)*
+**That's it.** Your AI clones it, installs what it needs, connects it to its memory, and opens Homebase as its own dark desktop app with your AI's face on your taskbar. Right-click that face and hit **Pin to taskbar** so it's one click away every day. *(Don't have a memory folder yet? Start with [The shelves](https://github.com/HunterBryson/the-shelves) first, then say **"Set up Homebase for us."**)*
 
 ---
 
@@ -57,7 +57,7 @@ The left side isn't just memory—it's your daily hub. Jump straight to your Wor
 <!-- FOUNDRY:FIT:START -->
 ## It all fits together
 
-Each build works on its own on **Claude or Antigravity**, and they all plug into each other the same way. Start with whichever one you want. When you set up another, your AI fits them together with `node tools/fit.mjs`, and the new one shows up where you already look.
+Each build works on its own with **Claude**, and they all plug into each other the same way. Start with whichever one you want. When you set up another, your AI fits them together with `node tools/fit.mjs`, and the new one shows up where you already look.
 
 - **[The shelves](https://github.com/HunterBryson/the-shelves):** a starter memory folder for your AI to move into—what Homebase draws, and what the glass opens when you point at a line.
 - **[The glass](https://github.com/HunterBryson/the-glass):** a see-through layer over your screen. Box anything, say what you want, and your AI answers right beside your mark.
@@ -95,8 +95,8 @@ No. Homebase runs locally on your own computer (`127.0.0.1`) and only answers to
 **Does it edit my AI's memory by itself?**
 Never. Homebase is read-only on your memory folder—your AI makes every edit, and Homebase lights up what changed so you can check it.
 
-**Does it cost anything?**
-No. Free and open forever (MIT license).
+**Does this need any extra accounts or API keys?**
+No — open source under the MIT license, running locally on your computer.
 
 **It's not showing my newest save.**
 Homebase checks for updates every few seconds automatically. If a window ever looks stuck, close it and click your AI's face on the taskbar again.
@@ -117,4 +117,4 @@ Homebase checks for updates every few seconds automatically. If a window ever lo
 
 Open an issue and pick a form—your AI can even fill it in for you. Rather email? Write to hello@workbenchagents.com. Every issue and email reaches me, and I answer it myself, usually within a few days. Security problems go privately: see [SECURITY.md](https://github.com/HunterBryson/.github/blob/main/SECURITY.md).
 
-Works with **Claude and Antigravity**. MIT license.
+Works with **Claude** (Antigravity support in testing). MIT license.

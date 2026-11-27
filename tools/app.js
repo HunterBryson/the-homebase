@@ -41,7 +41,10 @@ if (!exe || !fs.existsSync(exe)) { console.log('The app shell isn\'t downloaded 
 const flags = { install: ['--install'], uninstall: ['--uninstall'], open: [] }[cmd];
 if (!flags) { console.log('node tools/app.js setup|install|status|uninstall  (no word: open it)'); process.exit(1); }
 const before = state()?.at;
-const child = spawn(exe, [APP, ...flags, ...rest.filter(a => a === '--no-startup')], { detached: true, stdio: 'ignore', windowsHide: false });
+// Strip ELECTRON_RUN_AS_NODE so launching from Electron-based Claude Desktop / Antigravity starts Electron properly.
+const env = { ...process.env };
+delete env.ELECTRON_RUN_AS_NODE;
+const child = spawn(exe, [APP, ...flags, ...rest.filter(a => a === '--no-startup')], { detached: true, stdio: 'ignore', windowsHide: false, env });
 child.unref();
 if (cmd === 'install') {
   for (let i = 0; i < 40 && state()?.at === before; i++) await wait(250);
